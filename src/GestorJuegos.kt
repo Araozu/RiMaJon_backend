@@ -1,6 +1,7 @@
 package dev.araozu
 
 import io.ktor.http.cio.websocket.*
+import kotlinx.coroutines.isActive
 
 object GestorJuegos {
 
@@ -43,7 +44,7 @@ object GestorJuegos {
 
     private suspend fun broadcast(juego: Juego, mensaje: String) {
         juego.conexiones.forEach { (_, socket) ->
-            socket.send(Frame.Text(mensaje))
+            if (socket.isActive) socket.send(Frame.Text(mensaje))
         }
     }
 
