@@ -1,41 +1,49 @@
 package dev.araozu
 
-import io.ktor.application.*
-import io.ktor.http.*
-import io.ktor.request.*
-import io.ktor.response.*
-import io.ktor.routing.*
+import io.ktor.http.cio.websocket.*
 
-data class InfoJuego(val id: String)
-data class DataCrearJuego(val idUsuario: String)
+class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
 
-fun Routing.crearJuego() {
+    private val cartas: Array<Int> = GestorJuegos.generarCartas()
+    val conexiones: ArrayList<WebSocketSession> = arrayListOf()
+    private val manos: HashMap<String, Mano> = HashMap()
+    private val dora: ArrayList<Int> = arrayListOf()
+    var estadoJuego = EstadoJuego.Espera
+    var posCartaActual = 0
 
-    post("/partida") {
-        val dataUsuario = call.receive<DataCrearJuego>()
+    suspend fun iniciarJuego() {
+        if (estadoJuego != EstadoJuego.Espera) return
 
-        var sigId = GestorJuegos.generarId()
-        while (GestorJuegos.juegos.containsKey(sigId)) {
-            sigId = GestorJuegos.generarId()
+        estadoJuego = EstadoJuego.Iniciado
+        for (i in posCartaActual until (posCartaActual + 10)) {
+            dora.add(cartas[i])
+        }
+        posCartaActual += 10
+
+        for ((idUsuario, _) in usuarios) {
+            val cartas = ArrayList<Int>()
+
+            for (i in posCartaActual until (posCartaActual + 10)) {
+                cartas.add(cartas[i])
+            }
+            posCartaActual += 10
+
+            val mano = Mano(cartas)
+            manos[idUsuario] = mano
         }
 
-        val juego = Juego(arrayListOf())
-        GestorJuegos.juegos[sigId] = juego
-
-        call.respondText("{\"id\": \"$sigId\"}", contentType = ContentType.Application.Json)
+        conexiones.forEach { socket ->
+            socket.send(Frame.Text("{\"operacion\": \"juego_iniciado\"}"))
+        }
+        conexiones.clear()
     }
 
-    post("/partida-join") {
-        val infoJuego = call.receive<InfoJuego>()
-        if (infoJuego.id.length != 6) {
-            call.respondText("{\"error\": \"ID invalido.\"}", contentType = ContentType.Application.Json)
-        }
+    fun agregarConexion(conexion: WebSocketSession) {
+        conexiones.add(conexion)
+    }
 
-        if (GestorJuegos.juegos.containsKey(infoJuego.id)) {
-            call.respondText("{\"ok\": true}", contentType = ContentType.Application.Json)
-        } else {
-            call.respondText("{\"error\": \"El juego no existe\"}", contentType = ContentType.Application.Json)
-        }
+    fun agregarUsuario(idUsuario: String) {
+        usuarios.add(Pair(idUsuario, true))
     }
 
 }

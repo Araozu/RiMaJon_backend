@@ -2,21 +2,6 @@ package dev.araozu
 
 import io.ktor.http.cio.websocket.*
 
-data class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
-
-    private val cartas: Array<Int> = GestorJuegos.generarCartas()
-    val conexiones: ArrayList<WebSocketSession> = arrayListOf()
-
-    fun agregarConexion(conexion: WebSocketSession) {
-        conexiones.add(conexion)
-    }
-
-    fun agregarUsuario(idUsuario: String) {
-        usuarios.add(Pair(idUsuario, true))
-    }
-
-}
-
 object GestorJuegos {
 
     private val todasCartas = arrayOf(
