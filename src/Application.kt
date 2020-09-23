@@ -49,7 +49,8 @@ fun Application.module(testing: Boolean = false) {
         }
 
         this.crearJuego()
-        this.wsjuego()
+        this.wssala()
+        this.juegows()
         this.usuarios()
     }
 }

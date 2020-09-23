@@ -9,7 +9,7 @@ data class Conexion(val operacion: String, val datos: String)
 
 data class ConexionNueva(val idJuego: String, val idUsuario: String)
 
-fun Routing.wsjuego() {
+fun Routing.wssala() {
     val gson = Gson()
     webSocket("/socket") {
 
