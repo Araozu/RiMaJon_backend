@@ -22,6 +22,10 @@ fun Routing.wsjuego() {
                             val datos2 = gson.fromJson(datos.datos, ConexionNueva::class.java)
                             GestorJuegos.conectarASala(datos2.idJuego, datos2.idUsuario, this)
                         }
+                        "iniciar" -> {
+                            val datos2 = gson.fromJson(datos.datos, ConexionNueva::class.java)
+                            GestorJuegos.iniciarJuego(datos2.idJuego, this)
+                        }
                     }
                 }
             }

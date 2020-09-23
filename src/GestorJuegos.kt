@@ -42,7 +42,7 @@ object GestorJuegos {
     }
 
     private suspend fun broadcast(juego: Juego, mensaje: String) {
-        juego.conexiones.forEach { socket ->
+        juego.conexiones.forEach { (_, socket) ->
             socket.send(Frame.Text(mensaje))
         }
     }
@@ -61,9 +61,18 @@ object GestorJuegos {
             str += "{\"idUsuario\": \"$idUsuarioAct\", \"nombreUsuario\": \"$nombreUsuarioAct\"}"
         }
         str += "]"
-        juego.agregarConexion(ws)
+        juego.agregarConexion(idUsuario, ws)
         juego.agregarUsuario(idUsuario)
         ws.send(Frame.Text("{\"operacion\": \"conexion_exitosa\", \"jugadores\": $str}"))
+    }
+
+    suspend fun iniciarJuego(idJuego: String, ws: WebSocketSession) {
+        val juego = juegos[idJuego]
+        if (juego != null) {
+            juego.iniciarJuego(ws)
+        } else {
+            ws.send(Frame.Text("{\"operacion\": \"error\", \"razon\": \"Juego invalido\"}"))
+        }
     }
 
 }
