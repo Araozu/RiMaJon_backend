@@ -7,6 +7,8 @@ import io.ktor.websocket.*
 
 val gson = Gson()
 
+data class DatosDescarte(val idJuego: String, val idUsuario: String, val carta: Int)
+
 fun Routing.juegows() {
 
     webSocket("/juego") {
@@ -18,6 +20,10 @@ fun Routing.juegows() {
                     "conectar" -> {
                         val datos = gson.fromJson(sol.datos, ConexionNueva::class.java)
                         GestorJuegos.conectarASala(datos.idJuego, datos.idUsuario, this)
+                    }
+                    "descarte" -> {
+                        val datos = gson.fromJson(sol.datos, DatosDescarte::class.java)
+                        GestorJuegos.manejarDescarte(datos.idJuego, datos.idUsuario, datos.carta)
                     }
                 }
             }

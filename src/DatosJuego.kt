@@ -6,7 +6,8 @@ data class DatosJuego(
     val manos: HashMap<String, Mano>,
     val cartasRestantes: Int,
     val ordenJugadores: Array<String>,
-    val turnoActual: String
+    val turnoActual: String,
+    val turnosHastaDora: Int
 ) {
 
     override fun equals(other: Any?): Boolean {

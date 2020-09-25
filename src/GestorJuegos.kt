@@ -76,4 +76,9 @@ object GestorJuegos {
         }
     }
 
+    suspend fun manejarDescarte(idJuego: String, idUsuario: String, carta: Int) {
+        val juego = juegos[idJuego]!!
+        juego.manejarDescarte(idUsuario, carta)
+    }
+
 }
