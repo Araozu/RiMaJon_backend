@@ -13,7 +13,6 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
     private val doraOculto = Array(5) {0}
     private var estadoJuego = EstadoJuego.Espera
     private var posCartaActual = 0
-    private var cartasRestantes = 58
     private val turnoActual = 0
 
     suspend fun iniciarJuego(ws: WebSocketSession) {
@@ -86,7 +85,7 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
             doraPublico,
             doraOcultoS,
             manosS,
-            cartasRestantes,
+            108 - posCartaActual,
             ordenJugadores,
             idJugadorTurnoActual
         )
