@@ -11,10 +11,10 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
     private val dora: ArrayList<Int> = arrayListOf()
     private val doraPublico = Array(5) {0}
     private val doraOculto = Array(5) {0}
-    var estadoJuego = EstadoJuego.Espera
-    var posCartaActual = 0
-    var cartasRestantes = 58
-    val turnoActual = 0
+    private var estadoJuego = EstadoJuego.Espera
+    private var posCartaActual = 0
+    private var cartasRestantes = 58
+    private val turnoActual = 0
 
     suspend fun iniciarJuego(ws: WebSocketSession) {
         if (estadoJuego != EstadoJuego.Espera) return
@@ -32,24 +32,37 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
         doraPublico[0] = dora[0]
         doraOculto[0] = dora[4]
 
-        for ((idUsuario, _) in usuarios) {
+        // Asignar orden de jugadores
+        var i = 0
+        var idJugadorInicial = ""
+        conexiones.forEach { (idUsuario, _) ->
+            if (i == 0) idJugadorInicial = idUsuario
+            ordenJugadores[i] = idUsuario
+            i++
+
             val cartasL = arrayListOf<Int>()
 
-            for (i in posCartaActual until (posCartaActual + 10)) {
-                cartasL.add(cartas[i])
+            for (j in posCartaActual until (posCartaActual + 10)) {
+                cartasL.add(cartas[j])
             }
             posCartaActual += 10
 
-            val mano = Mano(cartasL)
+            val mano = if (idJugadorInicial == idUsuario) {
+                val sigCarta = cartas[posCartaActual]
+                posCartaActual++
+
+                Mano(cartasL, sigCarta = sigCarta)
+            } else {
+                Mano(cartasL)
+            }
+
             manos[idUsuario] = mano
         }
 
-        var i = 0
-        conexiones.forEach { (idUsuario, socket) ->
-            ordenJugadores[i] = idUsuario
-            i++
+        conexiones.forEach { (_, socket) ->
             socket.send(Frame.Text("{\"operacion\": \"juego_iniciado\"}"))
         }
+
         conexiones.clear()
     }
 
@@ -68,7 +81,15 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
             }
         }
 
-        val datosJuego = DatosJuego(doraPublico, doraOcultoS, manosS, cartasRestantes, ordenJugadores, ordenJugadores[turnoActual])
+        val idJugadorTurnoActual = ordenJugadores[turnoActual]
+        val datosJuego = DatosJuego(
+            doraPublico,
+            doraOcultoS,
+            manosS,
+            cartasRestantes,
+            ordenJugadores,
+            idJugadorTurnoActual
+        )
         ws.send(Frame.Text("{\"operacion\": \"actualizar_datos\", \"datos\": ${gson.toJson(datosJuego)}}"))
     }
 

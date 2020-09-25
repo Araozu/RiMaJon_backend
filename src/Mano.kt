@@ -5,7 +5,8 @@ data class Mano(
     val allIn: Boolean = false,
     val cartaSig: Int? = null,
     val cartasReveladas: ArrayList<ArrayList<Int>> = ArrayList(),
-    val descartes: List<Int> = ArrayList()
+    val descartes: List<Int> = ArrayList(),
+    val sigCarta: Int = -1
 ) {
 
     fun obtenerManoPrivada(): Mano {
