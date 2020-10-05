@@ -1,5 +1,6 @@
-package dev.araozu
+package dev.araozu.juego
 
+import dev.araozu.*
 import io.ktor.http.cio.websocket.*
 
 class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
@@ -8,13 +9,10 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
     val conexiones: HashMap<String, WebSocketSession> = HashMap()
     private val ordenJugadores = Array(4) { "" }
     private val manos: HashMap<String, Mano> = HashMap()
-    private val dora: ArrayList<Int> = arrayListOf()
-    private val doraPublico = Array(5) { 0 }
-    private val doraOculto = Array(5) { 0 }
+    private var gestorDora: GestorDora? = null
     private var estadoJuego = EstadoJuego.Espera
     private var posCartaActual = 0
     private var turnoActual = 0
-    private var turnosHastaDora = 27 // 27 17 7 3
 
     suspend fun iniciarJuego(ws: WebSocketSession) {
         if (estadoJuego != EstadoJuego.Espera) return
@@ -25,12 +23,14 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
         }
 
         estadoJuego = EstadoJuego.Iniciado
+
+        // Inicializar dora
+        val dora: ArrayList<Int> = arrayListOf()
         for (i in posCartaActual until (posCartaActual + 10)) {
             dora.add(cartas[i])
         }
+        gestorDora = GestorDora(dora)
         posCartaActual += 10
-        doraPublico[0] = dora[0]
-        doraOculto[0] = dora[4]
 
         // Asignar orden de jugadores
         var i = 0
@@ -50,7 +50,7 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
             val mano = if (idJugadorInicial == idUsuario) {
                 val sigCarta = cartas[posCartaActual]
                 posCartaActual++
-                turnosHastaDora--
+                gestorDora!!.actualizarDoraTurno()
 
                 Mano(cartasL, sigCarta = sigCarta)
             } else {
@@ -68,14 +68,10 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
     }
 
     private suspend fun enviarDatos(idUsuario: String, ws: WebSocketSession) {
-        var doraOcultoS = Array(5) { 0 }
         val manosS = HashMap<String, Mano>()
 
         for ((idUsuarioAct, mano) in manos) {
             if (idUsuarioAct == idUsuario) {
-                if (mano.allIn) {
-                    doraOcultoS = doraOculto
-                }
                 manosS[idUsuarioAct] = mano
             } else {
                 manosS[idUsuarioAct] = mano.obtenerManoPrivada()
@@ -83,14 +79,15 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
         }
 
         val idJugadorTurnoActual = ordenJugadores[turnoActual]
+        val (doraCerrado, doraAbierto) = gestorDora!!
         val datosJuego = DatosJuego(
-            doraPublico,
-            doraOcultoS,
+            doraCerrado,
+            doraAbierto,
             manosS,
             108 - posCartaActual,
             ordenJugadores,
             idJugadorTurnoActual,
-            turnosHastaDora
+            gestorDora!!.turnosRestantesDoraCerrado
         )
         ws.send(Frame.Text("{\"operacion\": \"actualizar_datos\", \"datos\": ${gson.toJson(datosJuego)}}"))
     }
@@ -154,7 +151,8 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
             oportunidadesJugador.add("seq")
         }
 
-        oportunidades[idSigJugador] = oportunidadesJugador
+        if (oportunidadesJugador.isNotEmpty())
+            oportunidades[idSigJugador] = oportunidadesJugador
 
         return if (oportunidades.isNotEmpty()) oportunidades else null
     }
@@ -197,35 +195,19 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
             val idSigUsuario = ordenJugadores[turnoActual]
             val sigCarta = cartas[posCartaActual]
             posCartaActual++
-            turnosHastaDora--
             manos[idSigUsuario]!!.sigCarta = sigCarta
 
             // Actualizar dora
-            if (turnosHastaDora == 0) {
-                val sigPosDora = doraPublico.indexOf(0)
-                // Si aun quedan doras
-                if (sigPosDora != -1) {
-                    doraPublico[sigPosDora] = dora[sigPosDora]
-                    turnosHastaDora = 15
-                }
-                // Si ya no hay doras
-                else {
-                    turnosHastaDora = 108
-                }
-            }
+            gestorDora!!.actualizarDoraTurno()
 
             // Enviar datos
             for ((idUsuarioEnvio, ws) in conexiones) {
                 val manosS = HashMap<String, Mano>()
-                var doraOcultoS = Array(5) { 0 }
 
                 for ((idUsuarioAct, mano) in manos) {
                     when (idUsuarioAct) {
                         idUsuarioEnvio -> {
                             manosS[idUsuarioAct] = mano
-                            if (mano.allIn) {
-                                doraOcultoS = doraOculto
-                            }
                         }
                         idUsuario -> {
                             manosS[idUsuarioAct] = mano.obtenerManoPrivada()
@@ -236,14 +218,15 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
                     }
                 }
 
+                val (doraCerrado, doraAbierto) = gestorDora!!
                 val datosJuego = DatosJuego(
-                    doraPublico,
-                    doraOcultoS,
+                    doraCerrado,
+                    doraAbierto,
                     manosS,
                     108 - posCartaActual,
                     ordenJugadores,
                     ordenJugadores[turnoActual],
-                    turnosHastaDora
+                    gestorDora!!.turnosRestantesDoraCerrado
                 )
                 ws.send(Frame.Text("{\"operacion\": \"actualizar_manos\", \"datos\": ${gson.toJson(datosJuego)}}"))
             }

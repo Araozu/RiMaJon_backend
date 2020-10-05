@@ -1,4 +1,4 @@
-package dev.araozu
+package dev.araozu.juego
 
 data class DatosJuego(
     val dora: Array<Int>,

@@ -1,4 +1,4 @@
-package dev.araozu
+package dev.araozu.juego
 
 enum class EstadoJuego {
     Espera,

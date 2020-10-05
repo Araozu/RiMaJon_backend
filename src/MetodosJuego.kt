@@ -1,5 +1,6 @@
 package dev.araozu
 
+import dev.araozu.juego.Juego
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.request.*
@@ -12,8 +13,6 @@ data class DataCrearJuego(val idUsuario: String)
 fun Routing.crearJuego() {
 
     post("/partida") {
-        val dataUsuario = call.receive<DataCrearJuego>()
-
         var sigId = GestorJuegos.generarId()
         while (GestorJuegos.juegos.containsKey(sigId)) {
             sigId = GestorJuegos.generarId()

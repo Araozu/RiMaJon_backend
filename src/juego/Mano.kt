@@ -1,8 +1,7 @@
-package dev.araozu
+package dev.araozu.juego
 
 data class Mano(
     val cartas: ArrayList<Int>,
-    val allIn: Boolean = false,
     val cartasReveladas: ArrayList<ArrayList<Int>> = ArrayList(),
     val descartes: ArrayList<Int> = ArrayList(),
     var sigCarta: Int = -1

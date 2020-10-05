@@ -1,5 +1,6 @@
 package dev.araozu
 
+import dev.araozu.juego.Juego
 import io.ktor.http.cio.websocket.*
 import kotlinx.coroutines.isActive
 
