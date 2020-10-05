@@ -14,7 +14,7 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
     private var estadoJuego = EstadoJuego.Espera
     private var posCartaActual = 0
     private var turnoActual = 0
-    private var turnosHastaDora = 15
+    private var turnosHastaDora = 27 // 27 17 7 3
 
     suspend fun iniciarJuego(ws: WebSocketSession) {
         if (estadoJuego != EstadoJuego.Espera) return
@@ -106,6 +106,66 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
         if (estadoJuego == EstadoJuego.Espera) usuarios.add(Pair(idUsuario, true))
     }
 
+    private fun arrContiene(v1: Int, v2: Int, arr: List<Int>): Boolean {
+        var v1E = false
+        var v2E = false
+        for (i in arr) {
+            if (i == v1) v1E = true
+            if (i == v2) v2E = true
+
+            if (v1E && v2E) return true
+        }
+
+        return false
+    }
+
+    private fun verificarTri(carta: Int): HashMap<String, ArrayList<String>>? {
+        // La carta es dragon o rey
+        if (carta > 54) return null
+
+        val idSigJugador = ordenJugadores[(turnoActual + 1) % 4]
+        val manoJugador = manos[idSigJugador]!!
+        val cartasJugador = manoJugador.cartas
+
+        val obtValorCarta = { valor: Int -> (valor shl 27) ushr 28 }
+        val obtTipoCarta = { valor: Int -> (valor shl 23) ushr 28 }
+
+        val valorCarta = obtValorCarta(carta)
+        val cartasAComparar = {
+            val filtro = obtTipoCarta(carta)
+            cartasJugador.filter { obtTipoCarta(it) == filtro } .map(obtValorCarta)
+        }()
+
+        val oportunidades = HashMap<String, ArrayList<String>>()
+
+        val oportunidadesJugador = ArrayList<String>()
+        // Primer caso: Xoo
+        if (arrContiene(valorCarta + 1, valorCarta + 2, cartasAComparar)) {
+            oportunidadesJugador.add("seq")
+        }
+
+        // Segundo caso: oXo
+        if (arrContiene(valorCarta - 1, valorCarta + 1, cartasAComparar)) {
+            oportunidadesJugador.add("seq")
+        }
+
+        // Tercer caso: ooX
+        if (arrContiene(valorCarta - 1, valorCarta - 2, cartasAComparar)) {
+            oportunidadesJugador.add("seq")
+        }
+
+        oportunidades[idSigJugador] = oportunidadesJugador
+
+        return if (oportunidades.isNotEmpty()) oportunidades else null
+    }
+
+    private suspend fun enviarOportunidades(oportunidades: HashMap<String, ArrayList<String>>, cartaDescartada: Int) {
+        for ((id, ops) in oportunidades) {
+            val oportunidadesL = OportunidadesJuego(ops, cartaDescartada)
+            conexiones[id]!!.send(Frame.Text("{\"operacion\": \"oportunidad\", \"datos\": ${gson.toJson(oportunidadesL)}}"))
+        }
+    }
+
     suspend fun manejarDescarte(idUsuario: String, carta: Int) {
         if (ordenJugadores[turnoActual] == idUsuario) {
             val m = manos[idUsuario]!!
@@ -124,6 +184,13 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
             }
 
             m.descartes.add(carta)
+
+            // Verificar seq/tri/quad/win
+            val oportunidades = verificarTri(carta)
+            if (oportunidades != null) {
+                enviarOportunidades(oportunidades, carta)
+                return
+            }
 
             // Extraer, dar sig carta al sig jugador, cambiar turno
             turnoActual = (turnoActual + 1) % 4
