@@ -118,6 +118,16 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
         manos[idSigUsuario]!!.sigCarta = sigCarta
     }
 
+    private fun esUsuarioIzq(idUsuarioIzq: String, idUsuario1: String): Boolean {
+        var posUsuario1 = 0
+        var posUsuarioIzq = 0
+        for ((posActual, idUsuario) in ordenJugadores.withIndex()) {
+            if (idUsuario == idUsuario1) posUsuario1 = posActual
+            if (idUsuario == idUsuarioIzq) posUsuarioIzq = posActual
+        }
+        return (posUsuarioIzq + 1) % 4 == posUsuario1
+    }
+
     suspend fun manejarDescarte(idUsuario: String, carta: Int) {
         if (ordenJugadores[turnoActual] == idUsuario) {
             val m = manos[idUsuario]!!
@@ -143,10 +153,13 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
                 // No buscar oportunidades en el usuario que acaba de descartar.
                 if (idUsuarioActual == idUsuario) continue
 
-                val oportunidadSeq = OportunidadSeq.verificar(carta, mano.cartas)
-                if (oportunidadSeq != null) {
-                    hayOportunidades = true
-                    mano.oportunidades.add(oportunidadSeq)
+                // Solo verificar seq en el jugador a la derecha del que descarto
+                if (esUsuarioIzq(idUsuario, idUsuarioActual)) {
+                    val oportunidadSeq = OportunidadSeq.verificar(carta, mano.cartas)
+                    if (oportunidadSeq != null) {
+                        hayOportunidades = true
+                        mano.oportunidades.add(oportunidadSeq)
+                    }
                 }
             }
 
