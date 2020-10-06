@@ -178,4 +178,30 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
         }
     }
 
+    suspend fun ignorarOportunidadSeq(idUsuario: String) {
+
+        var aunHayOportunidades = false
+        for ((id, mano) in manos) {
+            // Eliminar oportunidad del usuario
+            if (id == idUsuario) {
+                mano.oportunidades = arrayListOf()
+                continue
+            }
+
+            // Si algun otro jugador tiene una oportunidad
+            if (mano.oportunidades.isNotEmpty()) {
+                aunHayOportunidades = true
+            }
+        }
+
+        // Si no quedan oportunidades cambiar el turno al sig jugador
+        if (!aunHayOportunidades) {
+            cambiarTurnoSigJugadorConsecutivo()
+            gestorDora!!.actualizarDoraCerrado()
+        }
+
+        // Enviar los nuevos datos
+        enviarDatosATodos()
+    }
+
 }

@@ -9,6 +9,8 @@ val gson = Gson()
 
 data class DatosDescarte(val idJuego: String, val idUsuario: String, val carta: Int)
 
+data class DatosIgnorarOportunidad(val idJuego: String, val idUsuario: String)
+
 fun Routing.juegows() {
 
     webSocket("/juego") {
@@ -24,6 +26,10 @@ fun Routing.juegows() {
                     "descarte" -> {
                         val datos = gson.fromJson(sol.datos, DatosDescarte::class.java)
                         GestorJuegos.manejarDescarte(datos.idJuego, datos.idUsuario, datos.carta)
+                    }
+                    "ignorar_oportunidad" -> {
+                        val datos = gson.fromJson(sol.datos, DatosIgnorarOportunidad::class.java)
+                        GestorJuegos.manejarIgnorarOportunidad(datos.idJuego, datos.idUsuario)
                     }
                 }
             }

@@ -82,4 +82,9 @@ object GestorJuegos {
         juego.manejarDescarte(idUsuario, carta)
     }
 
+    suspend fun manejarIgnorarOportunidad(idJuego: String, idUsuario: String) {
+        val juego = juegos[idJuego]!!
+        juego.ignorarOportunidadSeq(idUsuario)
+    }
+
 }

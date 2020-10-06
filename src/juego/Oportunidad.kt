@@ -4,5 +4,4 @@ interface Oportunidad {
 
     val cartaDescartada: Int
     val nombreOportunidad: String
-
 }
