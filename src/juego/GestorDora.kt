@@ -4,8 +4,8 @@ class GestorDora(private val cartas: ArrayList<Int>) {
 
     private val doraCerrado = arrayListOf(cartas[0])
     private val doraAbierto = arrayListOf<Int>()
-    var turnosSigDora = 32
-    var turnosRestantesDoraCerrado = turnosSigDora // 32 16 8 4
+    var turnosSigDora = 20
+    var turnosRestantesDoraCerrado = turnosSigDora // 20 15 10 5
         private set
 
     operator fun component1(): ArrayList<Int> {
@@ -21,7 +21,7 @@ class GestorDora(private val cartas: ArrayList<Int>) {
         turnosRestantesDoraCerrado--
         if (turnosRestantesDoraCerrado == 0) {
             doraCerrado.add(cartas[doraCerrado.size])
-            turnosSigDora /= 2
+            turnosSigDora -= 5
             turnosRestantesDoraCerrado = turnosSigDora
         }
         if (doraCerrado.size == 5) {
