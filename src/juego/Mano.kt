@@ -13,7 +13,8 @@ data class Mano(
         l.addAll(cartas.map { 0 })
         return this.copy(
             cartas = l,
-            sigCarta = if (sigCarta != -1) 0 else sigCarta
+            sigCarta = if (sigCarta != -1) 0 else sigCarta,
+            oportunidades = arrayListOf()
         )
     }
 

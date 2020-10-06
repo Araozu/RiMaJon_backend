@@ -139,7 +139,10 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
 
             // Verificar seq/tri/quad/win
             var hayOportunidades = false
-            for ((_, mano) in manos) {
+            for ((idUsuarioActual, mano) in manos) {
+                // No buscar oportunidades en el usuario que acaba de descartar.
+                if (idUsuarioActual == idUsuario) continue
+
                 val oportunidadSeq = OportunidadSeq.verificar(carta, mano.cartas)
                 if (oportunidadSeq != null) {
                     hayOportunidades = true

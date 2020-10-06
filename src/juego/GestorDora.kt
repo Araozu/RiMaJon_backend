@@ -8,20 +8,12 @@ class GestorDora(private val cartas: ArrayList<Int>) {
     var turnosRestantesDoraCerrado = turnosSigDora // 32 16 8 4
         private set
 
-    operator fun component1(): Array<Int> {
-        val numDora = doraCerrado.size
-        return Array(5) {
-            if (it < numDora) doraCerrado[it]
-            else 0
-        }
+    operator fun component1(): ArrayList<Int> {
+        return doraCerrado
     }
 
-    operator fun component2(): Array<Int> {
-        val numDora = doraCerrado.size
-        return Array(5) {
-            if (it < numDora) doraAbierto[it]
-            else 0
-        }
+    operator fun component2(): ArrayList<Int> {
+        return doraAbierto
     }
 
     fun actualizarDoraCerrado() {
