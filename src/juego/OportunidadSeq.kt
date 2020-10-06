@@ -3,6 +3,8 @@ package dev.araozu.juego
 data class OportunidadSeq(override val cartaDescartada: Int, val combinaciones: ArrayList<Pair<Int, Int>>) :
     Oportunidad {
 
+    override val nombreOportunidad: String = "Seq"
+
     companion object {
 
         private fun arrlCartasContiene(arrl: ArrayList<CartaNumero>, v1: Int, v2: Int): Pair<Int, Int>? {
