@@ -87,4 +87,9 @@ object GestorJuegos {
         juego.ignorarOportunidadSeq(idUsuario)
     }
 
+    suspend fun manejarLlamarSeq(idJuego: String, idUsuario: String, cartaDescartada: Int, combinacion: Pair<Int, Int>) {
+        val juego = juegos[idJuego]!!
+        juego.manejarSeq(idUsuario, cartaDescartada, combinacion)
+    }
+
 }

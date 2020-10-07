@@ -8,8 +8,13 @@ import io.ktor.websocket.*
 val gson = Gson()
 
 data class DatosDescarte(val idJuego: String, val idUsuario: String, val carta: Int)
-
 data class DatosIgnorarOportunidad(val idJuego: String, val idUsuario: String)
+data class DatosLlamarSeq(
+    val idJuego: String,
+    val idUsuario: String,
+    val cartaDescartada: Int,
+    val combinacion: Pair<Int, Int>
+)
 
 fun Routing.juegows() {
 
@@ -30,6 +35,15 @@ fun Routing.juegows() {
                     "ignorar_oportunidad" -> {
                         val datos = gson.fromJson(sol.datos, DatosIgnorarOportunidad::class.java)
                         GestorJuegos.manejarIgnorarOportunidad(datos.idJuego, datos.idUsuario)
+                    }
+                    "llamar_seq" -> {
+                        val datos = gson.fromJson(sol.datos, DatosLlamarSeq::class.java)
+                        GestorJuegos.manejarLlamarSeq(
+                            datos.idJuego,
+                            datos.idUsuario,
+                            datos.cartaDescartada,
+                            datos.combinacion
+                        )
                     }
                 }
             }
