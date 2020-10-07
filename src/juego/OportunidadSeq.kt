@@ -19,7 +19,6 @@ data class OportunidadSeq(override val cartaDescartada: Int, val combinaciones: 
         }
 
         fun verificar(valorCarta: Int, cartasMano: ArrayList<Int>): OportunidadSeq? {
-            println("Verificando carta seq $valorCarta")
             val carta = Carta.obtenerCartaEspecifica(valorCarta)
             val (valor, cartasFiltradas) = when (carta) {
                 is CartaNumeroRojo -> Pair(carta.numero, CartaNumero.filtrarCartasRojo(cartasMano))

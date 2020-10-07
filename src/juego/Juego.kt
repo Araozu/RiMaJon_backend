@@ -138,7 +138,10 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
                 val posCarta = m.cartas.indexOf(carta)
                 if (posCarta != -1) {
                     m.cartas.removeAt(posCarta)
-                    m.cartas.add(m.sigCarta)
+
+                    // Tras llamar un Seq/Tri el jugador no tiene una carta adicional en su mano.
+                    if (m.sigCarta != -1) m.cartas.add(m.sigCarta)
+
                     m.sigCarta = -1
                 } else {
                     return

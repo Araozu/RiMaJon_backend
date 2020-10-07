@@ -29,7 +29,6 @@ sealed class CartaNumero(valor: Int, val numero: Int = (valor shl 27) ushr 28) :
             val arrl = arrayListOf<CartaNumeroRojo>()
 
             valores.forEach {
-                println("Creando carta para filtrar: $it")
                 val carta = obtenerCartaEspecifica(it)
                 if (carta is CartaNumeroRojo) arrl.add(carta)
             }
@@ -41,7 +40,6 @@ sealed class CartaNumero(valor: Int, val numero: Int = (valor shl 27) ushr 28) :
             val arrl = arrayListOf<CartaNumeroNegro>()
 
             valores.forEach {
-                println("Creando carta para filtrar: $it")
                 val carta = obtenerCartaEspecifica(it)
                 if (carta is CartaNumeroNegro) arrl.add(carta)
             }
