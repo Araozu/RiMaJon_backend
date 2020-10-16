@@ -164,6 +164,13 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
                         mano.oportunidades.add(oportunidadSeq)
                     }
                 }
+
+                // Oportunidades tri
+                val oportunidadTri = OportunidadTri.verificar(carta, mano.cartas)
+                if (oportunidadTri != null) {
+                    hayOportunidades = true
+                    mano.oportunidades.add(oportunidadTri)
+                }
             }
 
             if (hayOportunidades) {
