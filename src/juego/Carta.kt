@@ -18,13 +18,38 @@ sealed class Carta(val valor: Int) {
                 }
             }
         }
-
     }
 }
 
 sealed class CartaNumero(valor: Int, val numero: Int = (valor shl 27) ushr 28) : Carta(valor) {
 
     companion object {
+        fun separarCartasRojo(valores: ArrayList<Int>): Pair<ArrayList<CartaNumeroRojo>, ArrayList<Int>> {
+            val arrl = arrayListOf<CartaNumeroRojo>()
+            val arrlInt = arrayListOf<Int>()
+
+            valores.forEach {
+                val carta = obtenerCartaEspecifica(it)
+                if (carta is CartaNumeroRojo) arrl.add(carta)
+                else arrlInt.add(it)
+            }
+
+            return Pair(arrl, arrlInt)
+        }
+
+        fun separarCartasNegro(valores: ArrayList<Int>): Pair<ArrayList<CartaNumeroNegro>, ArrayList<Int>> {
+            val arrl = arrayListOf<CartaNumeroNegro>()
+            val arrlInt = arrayListOf<Int>()
+
+            valores.forEach {
+                val carta = obtenerCartaEspecifica(it)
+                if (carta is CartaNumeroNegro) arrl.add(carta)
+                else arrlInt.add(it)
+            }
+
+            return Pair(arrl, arrlInt)
+        }
+
         fun filtrarCartasRojo(valores: ArrayList<Int>): ArrayList<CartaNumeroRojo> {
             val arrl = arrayListOf<CartaNumeroRojo>()
 
