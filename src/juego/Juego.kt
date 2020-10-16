@@ -214,8 +214,16 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
         enviarDatosATodos()
     }
 
-    suspend fun manejarSeq(idUsuario: String, cartaDescartada: Int, combinacion: Pair<Int, Int>) {
+    private fun cambiarTurnoSegunIdUsuario(idUsuario: String) {
+        for ((posJugador, i) in ordenJugadores.withIndex()) {
+            if (i == idUsuario) {
+                turnoActual = posJugador
+                break
+            }
+        }
+    }
 
+    suspend fun manejarSeqTri(idUsuario: String, cartaDescartada: Int, combinacion: Pair<Int, Int>) {
         val manoJugadorDescarte = manos[ordenJugadores[turnoActual]]!!
         val descartesJ = manoJugadorDescarte.descartes
 
@@ -241,13 +249,16 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
         cartasRobador.remove(vCarta1)
         cartasRobador.remove(vCarta2)
         val seq = arrayListOf(cartaDescartada, vCarta1, vCarta2)
+        seq.sort()
         manoRobador.cartasReveladas.add(seq)
 
         // Eliminar las oportunidades
         manoRobador.oportunidades = arrayListOf()
 
         // Cambiar turno al robador sin dar carta
-        turnoActual = (turnoActual + 1) % 4
+        // turnoActual = (turnoActual + 1) % 4
+        cambiarTurnoSegunIdUsuario(idUsuario)
+
         gestorDora!!.actualizarDoraCerrado()
 
         enviarDatosATodos()

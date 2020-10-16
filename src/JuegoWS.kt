@@ -36,7 +36,7 @@ fun Routing.juegows() {
                         val datos = gson.fromJson(sol.datos, DatosIgnorarOportunidad::class.java)
                         GestorJuegos.manejarIgnorarOportunidad(datos.idJuego, datos.idUsuario)
                     }
-                    "llamar_seq" -> {
+                    "llamar_seq", "llamar_tri" -> {
                         val datos = gson.fromJson(sol.datos, DatosLlamarSeq::class.java)
                         GestorJuegos.manejarLlamarSeq(
                             datos.idJuego,

@@ -89,7 +89,7 @@ object GestorJuegos {
 
     suspend fun manejarLlamarSeq(idJuego: String, idUsuario: String, cartaDescartada: Int, combinacion: Pair<Int, Int>) {
         val juego = juegos[idJuego]!!
-        juego.manejarSeq(idUsuario, cartaDescartada, combinacion)
+        juego.manejarSeqTri(idUsuario, cartaDescartada, combinacion)
     }
 
 }
