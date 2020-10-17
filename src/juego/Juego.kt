@@ -207,7 +207,6 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
         // Si no quedan oportunidades cambiar el turno al sig jugador
         if (!aunHayOportunidades) {
             cambiarTurnoSigJugadorConsecutivo()
-            gestorDora!!.actualizarDoraCerrado()
         }
 
         // Enviar los nuevos datos
@@ -258,8 +257,6 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
         // Cambiar turno al robador sin dar carta
         // turnoActual = (turnoActual + 1) % 4
         cambiarTurnoSegunIdUsuario(idUsuario)
-
-        gestorDora!!.actualizarDoraCerrado()
 
         enviarDatosATodos()
     }
