@@ -1,7 +1,5 @@
 package dev.araozu.juego
 
-import com.sun.org.apache.xpath.internal.operations.Bool
-
 class ContenedorGrupos(
     private val tris: ArrayList<ArrayList<Carta>>,
     private val seqs: ArrayList<ArrayList<Carta>>,
