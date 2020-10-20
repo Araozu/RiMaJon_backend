@@ -22,7 +22,7 @@ class OportunidadWin(override val cartaDescartada: Int) : Oportunidad {
                 }
             }
 
-            throw Error("El valor de la carta no existe en el array.")
+            throw Error("El valor de la carta no existe en el array. Se pidio eliminar la carta $valorCarta")
         }
 
         private fun ArrayList<out CartaNumero>.eliminarCartaNumero(valorCarta: Int): CartaNumero {
@@ -33,7 +33,7 @@ class OportunidadWin(override val cartaDescartada: Int) : Oportunidad {
                 }
             }
 
-            throw Error("El valor de la carta no existe en el array.")
+            throw Error("El valor de la carta no existe en el array. Se pidio eliminar $valorCarta")
         }
 
         private fun obtTri(cartas: ArrayList<out Carta>): ArrayList<ArrayList<Carta>> {
@@ -60,7 +60,7 @@ class OportunidadWin(override val cartaDescartada: Int) : Oportunidad {
         private fun obtPar(cartas: ArrayList<out Carta>): ArrayList<ArrayList<Carta>> {
             val arrlR = arrayListOf<ArrayList<Carta>>()
             var i = 0
-            while (i + 2 < cartas.size) {
+            while (i + 1 < cartas.size) {
                 val primeraCarta = cartas[i]
                 val valorPrimeraCartaPar = (primeraCarta.valor ushr 1) shl 1
                 val primerElem = (primeraCarta.valor ushr 1) shl 1
@@ -79,7 +79,7 @@ class OportunidadWin(override val cartaDescartada: Int) : Oportunidad {
         private fun obtSeq1(cartas: ArrayList<out CartaNumero>): ArrayList<ArrayList<Carta>> {
             val arrlCartas = arrayListOf<ArrayList<Carta>>()
             var i = 0
-            while (i < cartas.size) {
+            while (i >= 0 && i < cartas.size) {
                 val primeraCarta = cartas[i]
                 val valorCartaPar = primeraCarta.numero
 
@@ -99,20 +99,20 @@ class OportunidadWin(override val cartaDescartada: Int) : Oportunidad {
             return arrlCartas
         }
 
-        private fun obtSeq2(cartas: ArrayList<CartaNumero>): ArrayList<ArrayList<CartaNumero>> {
-            val arrlCartas = arrayListOf<ArrayList<CartaNumero>>()
+        private fun obtSeq2(cartas: ArrayList<out CartaNumero>): ArrayList<ArrayList<Carta>> {
+            val arrlCartas = arrayListOf<ArrayList<Carta>>()
             var i = cartas.size - 1
-            while (i < cartas.size) {
+            while (i >= 0 && i < cartas.size) {
                 val primeraCarta = cartas[i]
-                val valorCartaPar = (primeraCarta.valor ushr 1) shl 1
+                val valorCartaPar = primeraCarta.numero
 
                 if (
                     cartas.cartaExisteEnArrl(valorCartaPar - 1)
                     && cartas.cartaExisteEnArrl(valorCartaPar - 2)
                 ) {
-                    val c1 = cartas.eliminarCarta(valorCartaPar)
-                    val c2 = cartas.eliminarCarta(valorCartaPar - 1)
-                    val c3 = cartas.eliminarCarta(valorCartaPar - 2)
+                    val c1 = cartas.eliminarCartaNumero(valorCartaPar)
+                    val c2 = cartas.eliminarCartaNumero(valorCartaPar - 1)
+                    val c3 = cartas.eliminarCartaNumero(valorCartaPar - 2)
                     arrlCartas.add(arrayListOf(c1, c2, c3))
                     i -= 3
                 } else {
@@ -134,7 +134,7 @@ class OportunidadWin(override val cartaDescartada: Int) : Oportunidad {
             contenedor1.agregarHuerfanos(cartas)
 
             val contenedor2 = ContenedorGrupos()
-            contenedor2.agregarSeqs(obtSeq1(cartas2))
+            contenedor2.agregarSeqs(obtSeq2(cartas2))
             contenedor2.agregarTris(obtTri(cartas2))
             contenedor2.agregarPares(obtPar(cartas2))
             contenedor2.agregarHuerfanos(cartas2)
@@ -149,6 +149,7 @@ class OportunidadWin(override val cartaDescartada: Int) : Oportunidad {
             val narrl = ArrayList<Int>(cartasMano.size + 1)
             narrl.addAll(cartasMano)
             narrl.add(valorCarta)
+            narrl.sort()
 
             val (cartasRojo, cartasRestantes1) = CartaNumero.separarCartasRojo(narrl)
             val (cartasNegro, cartasRestantes2) = CartaNumero.separarCartasNegro(cartasRestantes1)
@@ -160,6 +161,7 @@ class OportunidadWin(override val cartaDescartada: Int) : Oportunidad {
             // Obtener tris y pares de las cartas que no son numeros
             contenedorGrupos.agregarTris(obtTri(restoCartas))
             contenedorGrupos.agregarPares(obtPar(restoCartas))
+            contenedorGrupos.agregarHuerfanos(restoCartas)
 
             // Obtener tris, pares y seq de las cartas de numeros
             contenedorGrupos.agregarDesdeContenedor(obtenerContenedorCartasNumero(cartasRojo))

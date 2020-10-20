@@ -48,5 +48,4 @@ class ContenedorGrupos(
     fun estaListo(): Boolean =
         pares.size == 1 && huerfanos.size == 0
 
-
 }
