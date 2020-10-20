@@ -129,62 +129,69 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
     }
 
     suspend fun manejarDescarte(idUsuario: String, carta: Int) {
-        if (ordenJugadores[turnoActual] == idUsuario) {
-            val m = manos[idUsuario]!!
+        if (ordenJugadores[turnoActual] != idUsuario) return
 
-            if (m.sigCarta == carta) {
+        val m = manos[idUsuario]!!
+
+        if (m.sigCarta == carta) {
+            m.sigCarta = -1
+        } else {
+            val posCarta = m.cartas.indexOf(carta)
+            if (posCarta != -1) {
+                m.cartas.removeAt(posCarta)
+
+                // Tras llamar un Seq/Tri el jugador no tiene una carta adicional en su mano.
+                if (m.sigCarta != -1) m.cartas.add(m.sigCarta)
+
                 m.sigCarta = -1
             } else {
-                val posCarta = m.cartas.indexOf(carta)
-                if (posCarta != -1) {
-                    m.cartas.removeAt(posCarta)
-
-                    // Tras llamar un Seq/Tri el jugador no tiene una carta adicional en su mano.
-                    if (m.sigCarta != -1) m.cartas.add(m.sigCarta)
-
-                    m.sigCarta = -1
-                } else {
-                    return
-                }
+                return
             }
+        }
 
-            m.descartes.add(carta)
+        m.descartes.add(carta)
 
-            // Verificar seq/tri/quad/win
-            var hayOportunidades = false
-            for ((idUsuarioActual, mano) in manos) {
-                // No buscar oportunidades en el usuario que acaba de descartar.
-                if (idUsuarioActual == idUsuario) continue
+        // Verificar seq/tri/quad/win
+        var hayOportunidades = false
+        for ((idUsuarioActual, mano) in manos) {
+            // No buscar oportunidades en el usuario que acaba de descartar.
+            if (idUsuarioActual == idUsuario) continue
 
-                // Solo verificar seq en el jugador a la derecha del que descarto
-                if (esUsuarioIzq(idUsuario, idUsuarioActual)) {
-                    val oportunidadSeq = OportunidadSeq.verificar(carta, mano.cartas)
-                    if (oportunidadSeq != null) {
-                        hayOportunidades = true
-                        mano.oportunidades.add(oportunidadSeq)
-                    }
-                }
-
-                // Oportunidades tri
-                val oportunidadTri = OportunidadTri.verificar(carta, mano.cartas)
-                if (oportunidadTri != null) {
+            // Solo verificar seq en el jugador a la derecha del que descarto
+            if (esUsuarioIzq(idUsuario, idUsuarioActual)) {
+                val oportunidadSeq = OportunidadSeq.verificar(carta, mano.cartas)
+                if (oportunidadSeq != null) {
                     hayOportunidades = true
-                    mano.oportunidades.add(oportunidadTri)
+                    mano.oportunidades.add(oportunidadSeq)
                 }
             }
 
-            if (hayOportunidades) {
-                // Enviar datos
-                enviarDatosATodos()
-            } else {
-                cambiarTurnoSigJugadorConsecutivo()
-
-                // Actualizar dora
-                gestorDora!!.actualizarDoraCerrado()
-
-                // Enviar datos
-                enviarDatosATodos()
+            // Oportunidades tri
+            val oportunidadTri = OportunidadTri.verificar(carta, mano.cartas)
+            if (oportunidadTri != null) {
+                hayOportunidades = true
+                mano.oportunidades.add(oportunidadTri)
             }
+
+            // Oportunidades win
+            val oportunidadWin = OportunidadWin.verificar(carta, mano.cartas)
+            if (oportunidadWin != null) {
+                hayOportunidades = true
+                mano.oportunidades.add(oportunidadWin)
+            }
+        }
+
+        if (hayOportunidades) {
+            // Enviar datos
+            enviarDatosATodos()
+        } else {
+            cambiarTurnoSigJugadorConsecutivo()
+
+            // Actualizar dora
+            gestorDora!!.actualizarDoraCerrado()
+
+            // Enviar datos
+            enviarDatosATodos()
         }
     }
 

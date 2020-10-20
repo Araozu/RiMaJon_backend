@@ -145,7 +145,7 @@ class OportunidadWin(override val cartaDescartada: Int) : Oportunidad {
             return if (valorCont1 > valorCont2) contenedor1 else contenedor2
         }
 
-        fun verificar(valorCarta: Int, cartasMano: ArrayList<Int>) {
+        fun verificar(valorCarta: Int, cartasMano: ArrayList<Int>): OportunidadWin? {
             val narrl = ArrayList<Int>(cartasMano.size + 1)
             narrl.addAll(cartasMano)
             narrl.add(valorCarta)
@@ -165,7 +165,11 @@ class OportunidadWin(override val cartaDescartada: Int) : Oportunidad {
             contenedorGrupos.agregarDesdeContenedor(obtenerContenedorCartasNumero(cartasRojo))
             contenedorGrupos.agregarDesdeContenedor(obtenerContenedorCartasNumero(cartasNegro))
 
-
+            return if (contenedorGrupos.estaListo()) {
+                OportunidadWin(valorCarta)
+            } else {
+                null
+            }
         }
 
     }
