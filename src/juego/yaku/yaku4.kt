@@ -101,11 +101,13 @@ internal fun yakuEscalera(contenedorGrupos: ContenedorGrupos): Boolean {
 
     var primeraCarta = false
     var numeroActual = 0
+    var colorCarta = ""
     for (carrl in contenedorGrupos.tris) {
         for (c in carrl) {
             if (c !is CartaNumero) return false
 
             if (!primeraCarta) {
+                colorCarta = c.color
                 numeroActual = when (c.numero) {
                     1 -> 2
                     2 -> 3
@@ -115,6 +117,7 @@ internal fun yakuEscalera(contenedorGrupos: ContenedorGrupos): Boolean {
                 primeraCarta = true
             } else {
                 if (c.numero != numeroActual) return false
+                if (c.color != colorCarta) return false
 
                 numeroActual += 1
             }

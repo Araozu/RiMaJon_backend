@@ -35,7 +35,7 @@ sealed class Carta(val valor: Int) {
 
 }
 
-sealed class CartaNumero(valor: Int, val numero: Int = (valor shl 27) ushr 28) : Carta(valor) {
+sealed class CartaNumero(valor: Int, val color: String, val numero: Int = (valor shl 27) ushr 28) : Carta(valor) {
 
     companion object {
         fun separarCartasRojo(valores: ArrayList<Int>): Pair<ArrayList<CartaNumeroRojo>, ArrayList<Int>> {
@@ -91,8 +91,8 @@ sealed class CartaNumero(valor: Int, val numero: Int = (valor shl 27) ushr 28) :
 
 }
 
-class CartaNumeroNegro(valor: Int) : CartaNumero(valor)
-class CartaNumeroRojo(valor: Int) : CartaNumero(valor)
+class CartaNumeroNegro(valor: Int) : CartaNumero(valor, "negro")
+class CartaNumeroRojo(valor: Int) : CartaNumero(valor, "rojo")
 
 sealed class CartaDragon(valor: Int) : Carta(valor)
 
