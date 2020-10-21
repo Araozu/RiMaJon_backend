@@ -23,7 +23,7 @@ internal fun yakuDragonesFull(contenedorGrupos: ContenedorGrupos): Boolean {
         }
     }
 
-    return false
+    return true
 }
 
 internal fun yakuVerde(contenedorGrupos: ContenedorGrupos): Boolean {
