@@ -24,6 +24,12 @@ sealed class Carta(val valor: Int) {
     fun esCartaVerde() =
         valor == 128 || valor == 192 || valor == 224 || valor == 256
 
+    fun esCartaRoja() =
+        (valor in 34..53) || valor == 96
+
+    fun esCartaNegra() =
+        (valor in 2..21) || valor == 64
+
     fun esDragonORey() =
         valor == 64 || valor == 96 || valor == 128 || valor == 160 || valor == 192 || valor == 224 || valor == 256
 

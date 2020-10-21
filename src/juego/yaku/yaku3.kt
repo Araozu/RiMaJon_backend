@@ -17,10 +17,8 @@ internal fun yakuTripleSecuenciaCerrada(contenedorGrupos: ContenedorGrupos): Boo
     return false
 }
 
-internal fun yakuTripleTriples(contenedorGrupos: ContenedorGrupos): Boolean {
-
-    return false
-}
+internal fun yakuTripleTriples(contenedorGrupos: ContenedorGrupos) =
+    contenedorGrupos.tris.size == 3
 
 internal fun yakuInterior(contenedorGrupos: ContenedorGrupos): Boolean {
 

@@ -29,6 +29,7 @@ enum class Yaku {
     DobleSecuenciaPura
 }
 
+// TODO: Recibir como parametro si la mano esta abierta o cerrada y verificar los yakus aqui segun eso
 fun Yaku.obtenerListaYakus(contenedorGrupos: ContenedorGrupos): ArrayList<Yaku> {
     val listaYakus = ArrayList<Yaku>()
 
@@ -71,8 +72,9 @@ fun Yaku.obtenerListaYakus(contenedorGrupos: ContenedorGrupos): ArrayList<Yaku> 
         verificarEscalera = false
     }
 
+    // TODO: Verificar la mano abierta
     var verificarTripleTriples = true
-    if (yakuTripleTriplesCerrados(contenedorGrupos)) {
+    if (yakuTripleTriples(contenedorGrupos)) {
         listaYakus.add(Yaku.TripleTriplesCerrados)
         listaYakus.add(Yaku.TripleTriples)
         verificarTripleTriples = false

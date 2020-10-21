@@ -52,8 +52,6 @@ internal fun yakuEscaleraFull(contenedorGrupos: ContenedorGrupos): Boolean {
         }
     }
 
-    return false
+    return true
 }
 
-internal fun yakuTripleTriplesCerrados(contenedorGrupos: ContenedorGrupos) =
-    contenedorGrupos.tris.size == 3
