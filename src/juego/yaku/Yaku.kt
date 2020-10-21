@@ -32,8 +32,11 @@ enum class Yaku {
 fun Yaku.obtenerListaYakus(contenedorGrupos: ContenedorGrupos): ArrayList<Yaku> {
     val listaYakus = ArrayList<Yaku>()
 
-    // Invariante: 3 sequencias/triples/cuadruples y 1 par
-    if (contenedorGrupos.seqs.size + contenedorGrupos.tris.size != 3 || contenedorGrupos.pares.size != 1) {
+    // Invariante: 3 sequencias/triples/cuadruples, 1 par y ningun huerfano
+    if (contenedorGrupos.seqs.size + contenedorGrupos.tris.size != 3
+        || contenedorGrupos.pares.size != 1
+        || contenedorGrupos.huerfanos.size != 0
+    ) {
         throw Error("Error de invariante: Se intento verificar los yakus de un contenedor invalido.")
     }
 

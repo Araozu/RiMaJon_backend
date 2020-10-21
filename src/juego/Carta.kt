@@ -81,6 +81,8 @@ sealed class CartaNumero(valor: Int, val numero: Int = (valor shl 27) ushr 28) :
         }
     }
 
+    fun esExterior() = numero == 1 || numero == 10
+
 }
 
 class CartaNumeroNegro(valor: Int) : CartaNumero(valor)
