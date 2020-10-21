@@ -19,6 +19,11 @@ sealed class Carta(val valor: Int) {
             }
         }
     }
+
+    // Cartas de color verde: 128, 192, 224, 256
+    fun esCartaVerde() =
+        valor == 128 || valor == 192 || valor == 224 || valor == 256
+
 }
 
 sealed class CartaNumero(valor: Int, val numero: Int = (valor shl 27) ushr 28) : Carta(valor) {
