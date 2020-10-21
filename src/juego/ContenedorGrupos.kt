@@ -22,6 +22,22 @@ class ContenedorGrupos(
         huerfanos.addAll(c.huerfanos)
     }
 
+    fun agregarTriDesdeInt(t: ArrayList<Int>) {
+        val arrl = ArrayList<Carta>(t.size)
+
+        t.forEach { arrl.add(Carta.obtenerCartaEspecifica(it)) }
+
+        tris.add(arrl)
+    }
+
+    fun agregarSeqDesdeInt(t: ArrayList<Int>) {
+        val arrl = ArrayList<Carta>(t.size)
+
+        t.forEach { arrl.add(Carta.obtenerCartaEspecifica(it)) }
+
+        seqs.add(arrl)
+    }
+
     fun agregarSeqs(s: ArrayList<ArrayList<Carta>>) {
         seqs.addAll(s)
     }

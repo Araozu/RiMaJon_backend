@@ -1,6 +1,9 @@
 package dev.araozu.juego
 
-class OportunidadWin(override val cartaDescartada: Int) : Oportunidad {
+import dev.araozu.juego.yaku.Yaku
+import dev.araozu.juego.yaku.obtenerListaYakus
+
+class OportunidadWin(override val cartaDescartada: Int, val yaku: ArrayList<Yaku>) : Oportunidad {
 
     override val nombreOportunidad = "Win"
 
@@ -145,7 +148,7 @@ class OportunidadWin(override val cartaDescartada: Int) : Oportunidad {
             return if (valorCont1 > valorCont2) contenedor1 else contenedor2
         }
 
-        fun verificar(valorCarta: Int, cartasMano: ArrayList<Int>): OportunidadWin? {
+        fun verificar(valorCarta: Int, cartasMano: ArrayList<Int>, gruposAbiertos: ArrayList<ArrayList<Int>>): OportunidadWin? {
             val narrl = ArrayList<Int>(cartasMano.size + 1)
             narrl.addAll(cartasMano)
             narrl.add(valorCarta)
@@ -167,11 +170,28 @@ class OportunidadWin(override val cartaDescartada: Int) : Oportunidad {
             contenedorGrupos.agregarDesdeContenedor(obtenerContenedorCartasNumero(cartasRojo))
             contenedorGrupos.agregarDesdeContenedor(obtenerContenedorCartasNumero(cartasNegro))
 
-            return if (contenedorGrupos.estaListo()) {
-                OportunidadWin(valorCarta)
-            } else {
-                null
+            if (!contenedorGrupos.estaListo()) return null
+
+            val esManoAbierta = gruposAbiertos.isEmpty()
+
+            if (esManoAbierta) {
+                // Agregar los grupos abiertos al contenedor
+                for (arrl in gruposAbiertos) {
+                    // Tri
+                    if (((arrl[0] ushr 1) shl 1) == ((arrl[1] ushr 1) shl 1)) {
+                        contenedorGrupos.agregarTriDesdeInt(arrl)
+                    }
+                    // Seq
+                    else {
+                        contenedorGrupos.agregarSeqDesdeInt(arrl)
+                    }
+                }
             }
+
+            // Obtener yaku
+            val yaku = obtenerListaYakus(contenedorGrupos, esManoAbierta)
+
+            return OportunidadWin(valorCarta, yaku)
         }
 
     }

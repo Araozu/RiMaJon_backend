@@ -6,19 +6,23 @@ enum class Yaku {
     // 15
     DragonesFull,
     Verde,
+
     // 10
     RealezaDragones,
     RealezaFull,
+
     // 5
     TripleTriplesCerrados,
     EscaleraFull,
     Exterior,
+
     // 4
     Escalera,
     TripleCuadruples,
     Negro,
     Rojo,
     SemiExterior,
+
     // 3
     ParUnico,
     Dragones,
@@ -29,8 +33,7 @@ enum class Yaku {
     DobleSecuenciaPura
 }
 
-// TODO: Recibir como parametro si la mano esta abierta o cerrada y verificar los yakus aqui segun eso
-fun Yaku.obtenerListaYakus(contenedorGrupos: ContenedorGrupos): ArrayList<Yaku> {
+fun obtenerListaYakus(contenedorGrupos: ContenedorGrupos, esManoAbierta: Boolean): ArrayList<Yaku> {
     val listaYakus = ArrayList<Yaku>()
 
     // Invariante: 3 sequencias/triples/cuadruples, 1 par y ningun huerfano
@@ -72,9 +75,9 @@ fun Yaku.obtenerListaYakus(contenedorGrupos: ContenedorGrupos): ArrayList<Yaku> 
         verificarEscalera = false
     }
 
-    // TODO: Verificar la mano abierta
+    // Triple triples cerrados
     var verificarTripleTriples = true
-    if (yakuTripleTriples(contenedorGrupos)) {
+    if (!esManoAbierta && yakuTripleTriples(contenedorGrupos)) {
         listaYakus.add(Yaku.TripleTriplesCerrados)
         listaYakus.add(Yaku.TripleTriples)
         verificarTripleTriples = false
@@ -122,4 +125,3 @@ fun Yaku.obtenerListaYakus(contenedorGrupos: ContenedorGrupos): ArrayList<Yaku> 
 
     return listaYakus
 }
-

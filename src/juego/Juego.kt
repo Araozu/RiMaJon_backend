@@ -174,7 +174,7 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
             }
 
             // Oportunidades win
-            val oportunidadWin = OportunidadWin.verificar(carta, mano.cartas)
+            val oportunidadWin = OportunidadWin.verificar(carta, mano.cartas, mano.cartasReveladas)
             if (oportunidadWin != null) {
                 hayOportunidades = true
                 mano.oportunidades.add(oportunidadWin)
