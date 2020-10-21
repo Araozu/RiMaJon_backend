@@ -1,10 +1,10 @@
 package dev.araozu.juego
 
 class ContenedorGrupos(
-    private val tris: ArrayList<ArrayList<Carta>>,
-    private val seqs: ArrayList<ArrayList<Carta>>,
-    private val pares: ArrayList<ArrayList<Carta>>,
-    private val huerfanos: ArrayList<Carta>
+    val tris: ArrayList<ArrayList<Carta>>,
+    val seqs: ArrayList<ArrayList<Carta>>,
+    val pares: ArrayList<ArrayList<Carta>>,
+    val huerfanos: ArrayList<Carta>
 ) {
 
     constructor () : this(
