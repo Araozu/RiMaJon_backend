@@ -104,10 +104,11 @@ fun obtenerListaYakus(contenedorGrupos: ContenedorGrupos, esManoAbierta: Boolean
     if (yakuDobleSecuenciaPura(contenedorGrupos)) {
         listaYakus.add(Yaku.DobleSecuenciaPura)
     }
-    if (yakuRealeza(contenedorGrupos)) {
+    val cantidad = yakuRealeza(contenedorGrupos)
+    if (cantidad > 0) {
         listaYakus.add(Yaku.Realeza)
     }
-    if (yakuTripleSecuenciaCerrada(contenedorGrupos)) {
+    if (!esManoAbierta && yakuTripleSecuenciaCerrada(contenedorGrupos)) {
         listaYakus.add(Yaku.TripleSecuenciaCerrada)
     }
     if (verificarTripleTriples && yakuTripleTriples(contenedorGrupos)) {
@@ -116,7 +117,8 @@ fun obtenerListaYakus(contenedorGrupos: ContenedorGrupos, esManoAbierta: Boolean
     if (yakuInterior(contenedorGrupos)) {
         listaYakus.add(Yaku.Interior)
     }
-    if (yakuDragones(contenedorGrupos)) {
+    val cantidadDragon = yakuDragones(contenedorGrupos)
+    if (cantidadDragon > 0) {
         listaYakus.add(Yaku.Dragones)
     }
     if (yakuParUnico(contenedorGrupos)) {

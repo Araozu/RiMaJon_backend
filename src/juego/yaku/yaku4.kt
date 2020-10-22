@@ -102,7 +102,7 @@ internal fun yakuEscalera(contenedorGrupos: ContenedorGrupos): Boolean {
     var primeraCarta = false
     var numeroActual = 0
     var colorCarta = ""
-    for (carrl in contenedorGrupos.tris) {
+    for (carrl in contenedorGrupos.seqs) {
         for (c in carrl) {
             if (c !is CartaNumero) return false
 
