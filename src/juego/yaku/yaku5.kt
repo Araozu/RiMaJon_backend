@@ -3,7 +3,6 @@ package dev.araozu.juego.yaku
 import dev.araozu.juego.CartaNumero
 import dev.araozu.juego.ContenedorGrupos
 
-// TODO: Cambiar descripcion en la pagina web
 internal fun yakuExterior(contenedorGrupos: ContenedorGrupos): Boolean {
 
     if (contenedorGrupos.tris.size != 3) return false
@@ -25,6 +24,7 @@ internal fun yakuExterior(contenedorGrupos: ContenedorGrupos): Boolean {
     return true
 }
 
+// TODO: Las secuencias pueden no estar en orden
 internal fun yakuEscaleraFull(contenedorGrupos: ContenedorGrupos): Boolean {
 
     if (contenedorGrupos.seqs.size != 3) return false

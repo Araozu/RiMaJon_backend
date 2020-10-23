@@ -45,6 +45,12 @@ fun Routing.juegows() {
                             datos.combinacion
                         )
                     }
+                    "llamar_ron" -> {
+                        TODO()
+                    }
+                    "llamar_tsumo" -> {
+                        TODO()
+                    }
                 }
             }
         }

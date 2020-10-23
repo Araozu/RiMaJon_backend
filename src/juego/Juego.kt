@@ -110,12 +110,20 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
     }
 
     private fun cambiarTurnoSigJugadorConsecutivo() {
-        // Extraer, dar sig carta al sig jugador, cambiar turno
+        // Cambiar turno al sig jugador consecutivo
         turnoActual = (turnoActual + 1) % 4
+
         val idSigUsuario = ordenJugadores[turnoActual]
+
+        // Extraer sig carta. TODO: Verificar que no quedan cartas y establecer empate
         val sigCarta = cartas[posCartaActual]
         posCartaActual++
+
+        // Asignar nueva carta
         manos[idSigUsuario]!!.sigCarta = sigCarta
+
+        // TODO: Verificar tsumo
+
     }
 
     private fun esUsuarioIzq(idUsuarioIzq: String, idUsuario1: String): Boolean {
@@ -173,7 +181,7 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
                 mano.oportunidades.add(oportunidadTri)
             }
 
-            // Oportunidades win
+            // Oportunidades win (ron)
             val oportunidadWin = OportunidadWin.verificar(carta, mano.cartas, mano.cartasReveladas)
             if (oportunidadWin != null) {
                 hayOportunidades = true
@@ -214,10 +222,13 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
         // Si no quedan oportunidades cambiar el turno al sig jugador
         if (!aunHayOportunidades) {
             cambiarTurnoSigJugadorConsecutivo()
-        }
 
-        // Enviar los nuevos datos
-        enviarDatosATodos()
+            // Actualizar dora
+            gestorDora!!.actualizarDoraCerrado()
+
+            // Enviar los nuevos datos
+            enviarDatosATodos()
+        }
     }
 
     private fun cambiarTurnoSegunIdUsuario(idUsuario: String) {

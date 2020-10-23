@@ -95,6 +95,7 @@ internal fun yakuTripleCuadruples(contenedorGrupos: ContenedorGrupos): Boolean {
     return true
 }
 
+// TODO: Las secuencias pueden no estar en orden
 internal fun yakuEscalera(contenedorGrupos: ContenedorGrupos): Boolean {
 
     if (contenedorGrupos.seqs.size != 3) return false

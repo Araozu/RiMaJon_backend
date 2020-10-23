@@ -1,7 +1,5 @@
 package dev.araozu
 
-import io.ktor.http.cio.websocket.*
-
 object GestorUsuarios {
 
     private val usuarios: HashMap<String, String> = HashMap()
