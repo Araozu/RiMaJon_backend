@@ -41,7 +41,8 @@ fun obtenerListaYakus(contenedorGrupos: ContenedorGrupos, esManoAbierta: Boolean
         || contenedorGrupos.pares.size != 1
         || contenedorGrupos.huerfanos.size != 0
     ) {
-        throw Error("Error de invariante: Se intento verificar los yakus de un contenedor invalido.")
+        System.err.println("Error de invariante: Se intento verificar los yakus de un contenedor invalido.")
+        return arrayListOf()
     }
 
     // 15 puntos

@@ -60,6 +60,6 @@ class ContenedorGrupos(
         tris.size + seqs.size + (if (pares.size <= 1) 1 else 0) - huerfanos.size
 
     fun estaListo(): Boolean =
-        pares.size == 1 && huerfanos.size == 0
+        pares.size == 1 && huerfanos.size == 0 && (tris.size + seqs.size == 3)
 
 }

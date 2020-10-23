@@ -120,9 +120,14 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
         posCartaActual++
 
         // Asignar nueva carta
-        manos[idSigUsuario]!!.sigCarta = sigCarta
+        val manoSigJugador = manos[idSigUsuario]!!
+        manoSigJugador.sigCarta = sigCarta
 
-        // TODO: Verificar tsumo
+        // TODO: Arreglar. Roto.
+        val oportunidadWin = OportunidadWin.verificar(sigCarta, manoSigJugador.cartas, manoSigJugador.cartasReveladas)
+        if (oportunidadWin != null) {
+            manoSigJugador.oportunidades.add(oportunidadWin)
+        }
 
     }
 
@@ -203,6 +208,7 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
         }
     }
 
+    // TODO: Usar diferente metodo para ignorar oportunidad Tsumo
     suspend fun ignorarOportunidadSeq(idUsuario: String) {
 
         var aunHayOportunidades = false
@@ -213,6 +219,7 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
                 continue
             }
 
+            // TODO: Notificar al jugador que su oportunidad ha sido ignorada
             // Si algun otro jugador tiene una oportunidad
             if (mano.oportunidades.isNotEmpty()) {
                 aunHayOportunidades = true
