@@ -35,10 +35,13 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
 
         // Asignar orden de jugadores
         var i = 0
+        val posInicio = (Math.random() * 4).toInt()
         var idJugadorInicial = ""
         conexiones.forEach { (idUsuario, _) ->
-            if (i == 0) idJugadorInicial = idUsuario
+            if (i == posInicio) idJugadorInicial = idUsuario
+
             ordenJugadores[i] = idUsuario
+            val dragonActual = Dragon.get(i)
             i++
 
             val cartasL = arrayListOf<Int>()
@@ -47,7 +50,6 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
                 cartasL.add(cartas[j])
             }
             posCartaActual += 10
-            val dragonActual = Dragon.get(i)
 
             val mano = if (idJugadorInicial == idUsuario) {
                 val sigCarta = cartas[posCartaActual]
