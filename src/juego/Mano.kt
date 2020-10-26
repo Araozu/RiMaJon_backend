@@ -5,7 +5,8 @@ data class Mano(
     val cartasReveladas: ArrayList<ArrayList<Int>> = arrayListOf(),
     val descartes: ArrayList<Int> = arrayListOf(),
     var sigCarta: Int = -1,
-    var oportunidades: ArrayList<Oportunidad> = arrayListOf()
+    var oportunidades: ArrayList<Oportunidad> = arrayListOf(),
+    val dragon: Dragon
 ) {
 
     fun obtenerManoPrivada(): Mano {
@@ -17,7 +18,5 @@ data class Mano(
             oportunidades = arrayListOf()
         )
     }
-
-
 
 }

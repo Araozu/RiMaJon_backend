@@ -3,7 +3,7 @@ package dev.araozu.juego
 class GestorDora(private val cartas: ArrayList<Int>) {
 
     private val doraCerrado = arrayListOf(cartas[0])
-    private val doraAbierto = arrayListOf(cartas[5])
+    private val doraAbierto = arrayListOf<Int>()
     private var turnosSigDora = 20
     var turnosRestantesDoraCerrado = turnosSigDora // 20 15 10 5
         private set

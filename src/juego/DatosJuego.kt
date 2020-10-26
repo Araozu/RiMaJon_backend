@@ -7,7 +7,8 @@ data class DatosJuego(
     val cartasRestantes: Int,
     val ordenJugadores: Array<String>,
     val turnoActual: String,
-    val turnosHastaDora: Int
+    val turnosHastaDora: Int,
+    val dragonPartida: Dragon
 ) {
 
     override fun equals(other: Any?): Boolean {
@@ -23,6 +24,7 @@ data class DatosJuego(
         if (!ordenJugadores.contentEquals(other.ordenJugadores)) return false
         if (turnoActual != other.turnoActual) return false
         if (turnosHastaDora != other.turnosHastaDora) return false
+        if (dragonPartida != other.dragonPartida) return false
 
         return true
     }
@@ -35,6 +37,7 @@ data class DatosJuego(
         result = 31 * result + ordenJugadores.contentHashCode()
         result = 31 * result + turnoActual.hashCode()
         result = 31 * result + turnosHastaDora
+        result = 31 * result + dragonPartida.hashCode()
         return result
     }
 

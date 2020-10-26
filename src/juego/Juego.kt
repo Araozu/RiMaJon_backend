@@ -13,6 +13,7 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
     private var estadoJuego = EstadoJuego.Espera
     private var posCartaActual = 0
     private var turnoActual = 0
+    private var dragonPartida = Dragon.Negro
 
     suspend fun iniciarJuego(ws: WebSocketSession) {
         if (estadoJuego != EstadoJuego.Espera) return
@@ -46,15 +47,17 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
                 cartasL.add(cartas[j])
             }
             posCartaActual += 10
+            val dragonActual = Dragon.get(i)
 
             val mano = if (idJugadorInicial == idUsuario) {
                 val sigCarta = cartas[posCartaActual]
                 posCartaActual++
                 gestorDora!!.actualizarDoraCerrado()
+                dragonPartida = dragonActual
 
-                Mano(cartasL, sigCarta = sigCarta)
+                Mano(cartasL, sigCarta = sigCarta, dragon = dragonActual)
             } else {
-                Mano(cartasL)
+                Mano(cartasL, dragon = dragonActual)
             }
 
             manos[idUsuario] = mano
@@ -87,7 +90,8 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
             108 - posCartaActual,
             ordenJugadores,
             idJugadorTurnoActual,
-            gestorDora!!.turnosRestantesDoraCerrado
+            gestorDora!!.turnosRestantesDoraCerrado,
+            dragonPartida
         )
         ws.send(Frame.Text("{\"operacion\": \"actualizar_datos\", \"datos\": ${gson.toJson(datosJuego)}}"))
     }
