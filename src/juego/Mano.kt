@@ -1,12 +1,12 @@
 package dev.araozu.juego
 
 data class Mano(
-    val cartas: ArrayList<Int>,
+    var cartas: ArrayList<Int> = arrayListOf(),
     val cartasReveladas: ArrayList<ArrayList<Int>> = arrayListOf(),
     val descartes: ArrayList<Int> = arrayListOf(),
     var sigCarta: Int = -1,
     var oportunidades: ArrayList<Oportunidad> = arrayListOf(),
-    val dragon: Dragon
+    val dragon: Dragon = Dragon.Negro
 ) {
 
     fun obtenerManoPrivada(): Mano {

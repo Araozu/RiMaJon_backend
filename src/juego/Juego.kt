@@ -6,9 +6,10 @@ import io.ktor.http.cio.websocket.*
 class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
 
     private val cartas: Array<Int> = GestorJuegos.generarCartas()
-    val conexiones: HashMap<String, WebSocketSession> = HashMap()
+
+    internal var jugadores = Array<Jugador>(4) { JugadorBot(this, "Bot $it") }
+
     private val ordenJugadores = Array(4) { "" }
-    private val manos: HashMap<String, Mano> = HashMap()
     private var gestorDora = GestorDora(cartas)
     private var estadoJuego = EstadoJuego.Espera
     private var posCartaActual = 10
@@ -63,42 +64,43 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
         conexiones.clear()
     }
 
-    private suspend fun enviarDatos(idUsuario: String, ws: WebSocketSession) {
-        val manosS = HashMap<String, Mano>()
-
-        for ((idUsuarioAct, mano) in manos) {
-            if (idUsuarioAct == idUsuario) {
-                manosS[idUsuarioAct] = mano
-            } else {
-                manosS[idUsuarioAct] = mano.obtenerManoPrivada()
-            }
-        }
-
+    private fun obtenerDatosJuegoActuales(): DatosJuego {
         val idJugadorTurnoActual = ordenJugadores[posJugadorActual]
-        val doraCerrado = gestorDora.dora
-        val datosJuego = DatosJuego(
-            doraCerrado,
-            manosS,
-            108 - posCartaActual,
-            ordenJugadores,
-            idJugadorTurnoActual,
-            gestorDora.turnosRestantesDora,
-            dragonPartida,
-            oportunidadesRestantes
+        return DatosJuego(
+            dora = arrayListOf(),
+            manos = hashMapOf(),
+            cartasRestantes = 108 - posCartaActual,
+            ordenJugadores = ordenJugadores,
+            turnoActual = idJugadorTurnoActual,
+            turnosHastaDora = gestorDora.turnosRestantesDora,
+            dragonPartida = dragonPartida,
+            oportunidadesRestantes = oportunidadesRestantes
         )
-        ws.send(Frame.Text("{\"operacion\": \"actualizar_datos\", \"datos\": ${gson.toJson(datosJuego)}}"))
     }
 
     private suspend fun enviarDatosATodos() {
-        for ((idUsuario, ws) in conexiones) {
-            enviarDatos(idUsuario, ws)
-        }
+        val datosJuego = obtenerDatosJuegoActuales()
+
+        jugadores.forEach { it.enviarDatos(datosJuego) }
     }
 
     suspend fun agregarConexion(idUsuario: String, conexion: WebSocketSession) {
-        conexiones[idUsuario] = conexion
-        if (estadoJuego == EstadoJuego.Iniciado) {
-            enviarDatos(idUsuario, conexion)
+        // Buscar si el jugador ya existia
+        jugadores.forEach {
+            if (it.idUsuario == idUsuario) {
+                it.actualizarConexion(conexion)
+                it.enviarDatos(obtenerDatosJuegoActuales())
+                return
+            }
+        }
+
+        // El jugador es nuevo. Asignarlo.
+        val nuevoJugador = JugadorHumano(this, idUsuario, conexion)
+        for (i in 0 until 4) {
+            if (jugadores[i] !is JugadorBot) {
+                jugadores[i] = nuevoJugador
+                break
+            }
         }
     }
 
