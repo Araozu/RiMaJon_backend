@@ -44,10 +44,6 @@ fun Application.module(testing: Boolean = false) {
     }
 
     routing {
-        get("/json/gson") {
-            call.respond(mapOf("hello" to "world"))
-        }
-
         this.crearJuego()
         this.wssala()
         this.juegows()

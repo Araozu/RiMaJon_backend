@@ -1,37 +1,36 @@
 package dev.araozu.juego
 
-class GestorDora(private val cartas: ArrayList<Int>) {
+class GestorDora(cartasIniciales: Array<Int>) {
 
-    private val doraCerrado = arrayListOf(cartas[0])
-    private val doraAbierto = arrayListOf<Int>()
+    private val cartas = Array(5) {-1}
+    val dora = arrayListOf(cartas[0])
     private var turnosSigDora = 20
-    var turnosRestantesDoraCerrado = turnosSigDora // 20 15 10 5
+    var turnosRestantesDora = turnosSigDora // 20 15 10 5
         private set
 
+    init {
+        for (i in 0 until 5) {
+            cartas[i] = cartasIniciales[i]
+        }
+    }
+
     operator fun component1(): ArrayList<Int> {
-        return doraCerrado
+        return dora
     }
 
-    operator fun component2(): ArrayList<Int> {
-        return doraAbierto
-    }
+    fun actualizarDora() {
+        if (dora.size >= 5) return
+        turnosRestantesDora--
 
-    fun actualizarDoraCerrado() {
-        if (doraCerrado.size >= 5) return
-        turnosRestantesDoraCerrado--
-        if (turnosRestantesDoraCerrado == 0) {
-            doraCerrado.add(cartas[doraCerrado.size])
+        if (turnosRestantesDora == 0) {
+            dora.add(cartas[dora.size])
             turnosSigDora -= 5
-            turnosRestantesDoraCerrado = turnosSigDora
+            turnosRestantesDora = turnosSigDora
         }
-        if (doraCerrado.size == 5) {
-            turnosRestantesDoraCerrado = -1
-        }
-    }
 
-    fun actualizarDoraAbierto() {
-        if (doraAbierto.size >= 5) return
-        doraAbierto.add(cartas[5 + doraAbierto.size])
+        if (dora.size == 5) {
+            turnosRestantesDora = -1
+        }
     }
 
 }

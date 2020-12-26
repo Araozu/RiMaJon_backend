@@ -9,11 +9,12 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
     val conexiones: HashMap<String, WebSocketSession> = HashMap()
     private val ordenJugadores = Array(4) { "" }
     private val manos: HashMap<String, Mano> = HashMap()
-    private var gestorDora: GestorDora? = null
+    private var gestorDora = GestorDora(cartas)
     private var estadoJuego = EstadoJuego.Espera
-    private var posCartaActual = 0
-    private var turnoActual = 0
+    private var posCartaActual = 10
+    private var posJugadorActual = 0
     private var dragonPartida = Dragon.Negro
+    private var oportunidadesRestantes = 0
 
     suspend fun iniciarJuego(ws: WebSocketSession) {
         if (estadoJuego != EstadoJuego.Espera) return
@@ -25,24 +26,12 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
 
         estadoJuego = EstadoJuego.Iniciado
 
-        // Inicializar dora
-        val dora: ArrayList<Int> = arrayListOf()
-        for (i in posCartaActual until (posCartaActual + 10)) {
-            dora.add(cartas[i])
-        }
-        gestorDora = GestorDora(dora)
-        posCartaActual += 10
-
         // Asignar orden de jugadores
         var i = 0
         val posInicio = (Math.random() * 4).toInt()
-        var idJugadorInicial = ""
         conexiones.forEach { (idUsuario, _) ->
-            if (i == posInicio) idJugadorInicial = idUsuario
-
             ordenJugadores[i] = idUsuario
             val dragonActual = Dragon.get(i)
-            i++
 
             val cartasL = arrayListOf<Int>()
 
@@ -51,11 +40,12 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
             }
             posCartaActual += 10
 
-            val mano = if (idJugadorInicial == idUsuario) {
+            val mano = if (i == posInicio) {
                 val sigCarta = cartas[posCartaActual]
                 posCartaActual++
-                gestorDora!!.actualizarDoraCerrado()
+                gestorDora.actualizarDora()
                 dragonPartida = dragonActual
+                posJugadorActual = i
 
                 Mano(cartasL, sigCarta = sigCarta, dragon = dragonActual)
             } else {
@@ -63,6 +53,7 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
             }
 
             manos[idUsuario] = mano
+            i++
         }
 
         conexiones.forEach { (_, socket) ->
@@ -83,17 +74,17 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
             }
         }
 
-        val idJugadorTurnoActual = ordenJugadores[turnoActual]
-        val (doraCerrado, doraAbierto) = gestorDora!!
+        val idJugadorTurnoActual = ordenJugadores[posJugadorActual]
+        val doraCerrado = gestorDora.dora
         val datosJuego = DatosJuego(
             doraCerrado,
-            doraAbierto,
             manosS,
             108 - posCartaActual,
             ordenJugadores,
             idJugadorTurnoActual,
-            gestorDora!!.turnosRestantesDoraCerrado,
-            dragonPartida
+            gestorDora.turnosRestantesDora,
+            dragonPartida,
+            oportunidadesRestantes
         )
         ws.send(Frame.Text("{\"operacion\": \"actualizar_datos\", \"datos\": ${gson.toJson(datosJuego)}}"))
     }
@@ -117,9 +108,10 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
 
     private fun cambiarTurnoSigJugadorConsecutivo() {
         // Cambiar turno al sig jugador consecutivo
-        turnoActual = (turnoActual + 1) % 4
+        posJugadorActual = (posJugadorActual + 1) % 4
+        oportunidadesRestantes = 0
 
-        val idSigUsuario = ordenJugadores[turnoActual]
+        val idSigUsuario = ordenJugadores[posJugadorActual]
 
         // Extraer sig carta. TODO: Verificar que no quedan cartas y establecer empate
         val sigCarta = cartas[posCartaActual]
@@ -148,7 +140,11 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
     }
 
     suspend fun manejarDescarte(idUsuario: String, carta: Int) {
-        if (ordenJugadores[turnoActual] != idUsuario) return
+        if (ordenJugadores[posJugadorActual] != idUsuario) return
+
+        // Si el jugador del turno actual ya descarto, otros jugadores tienen oportunidades
+        // e intento descartar de nuevo
+        if (oportunidadesRestantes > 0) return
 
         val m = manos[idUsuario]!!
 
@@ -170,7 +166,7 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
 
         m.descartes.add(carta)
 
-        // Verificar seq/tri/quad/win
+        // Verificar seq/tri/win
         var hayOportunidades = false
         for ((idUsuarioActual, mano) in manos) {
             // No buscar oportunidades en el usuario que acaba de descartar.
@@ -181,6 +177,7 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
                 val oportunidadSeq = OportunidadSeq.verificar(carta, mano.cartas)
                 if (oportunidadSeq != null) {
                     hayOportunidades = true
+                    oportunidadesRestantes++
                     mano.oportunidades.add(oportunidadSeq)
                 }
             }
@@ -189,6 +186,7 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
             val oportunidadTri = OportunidadTri.verificar(carta, mano.cartas)
             if (oportunidadTri != null) {
                 hayOportunidades = true
+                oportunidadesRestantes++
                 mano.oportunidades.add(oportunidadTri)
             }
 
@@ -196,6 +194,7 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
             val oportunidadWin = OportunidadWin.verificar(carta, mano.cartas, mano.cartasReveladas)
             if (oportunidadWin != null) {
                 hayOportunidades = true
+                oportunidadesRestantes++
                 mano.oportunidades.add(oportunidadWin)
             }
         }
@@ -207,7 +206,7 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
             cambiarTurnoSigJugadorConsecutivo()
 
             // Actualizar dora
-            gestorDora!!.actualizarDoraCerrado()
+            gestorDora.actualizarDora()
 
             // Enviar datos
             enviarDatosATodos()
@@ -218,14 +217,16 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
     suspend fun ignorarOportunidadSeq(idUsuario: String) {
 
         var aunHayOportunidades = false
+        oportunidadesRestantes--
+
         for ((id, mano) in manos) {
             // Eliminar oportunidad del usuario
             if (id == idUsuario) {
                 mano.oportunidades = arrayListOf()
+                enviarDatos(id, conexiones[id]!!)
                 continue
             }
 
-            // TODO: Notificar al jugador que su oportunidad ha sido ignorada
             // Si algun otro jugador tiene una oportunidad
             if (mano.oportunidades.isNotEmpty()) {
                 aunHayOportunidades = true
@@ -237,7 +238,7 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
             cambiarTurnoSigJugadorConsecutivo()
 
             // Actualizar dora
-            gestorDora!!.actualizarDoraCerrado()
+            gestorDora.actualizarDora()
 
             // Enviar los nuevos datos
             enviarDatosATodos()
@@ -247,14 +248,14 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
     private fun cambiarTurnoSegunIdUsuario(idUsuario: String) {
         for ((posJugador, i) in ordenJugadores.withIndex()) {
             if (i == idUsuario) {
-                turnoActual = posJugador
+                posJugadorActual = posJugador
                 break
             }
         }
     }
 
     suspend fun manejarSeqTri(idUsuario: String, cartaDescartada: Int, combinacion: Pair<Int, Int>) {
-        val manoJugadorDescarte = manos[ordenJugadores[turnoActual]]!!
+        val manoJugadorDescarte = manos[ordenJugadores[posJugadorActual]]!!
         val descartesJ = manoJugadorDescarte.descartes
 
         // La carta solicitada para robar es invalida
@@ -284,6 +285,7 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
 
         // Eliminar las oportunidades
         manoRobador.oportunidades = arrayListOf()
+        oportunidadesRestantes = 0
 
         // Cambiar turno al robador sin dar carta
         // turnoActual = (turnoActual + 1) % 4
