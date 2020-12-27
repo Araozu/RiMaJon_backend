@@ -49,7 +49,7 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
         ordenJugadores = Array(4) { jugadores[it].idUsuario }
     }
 
-    private fun obtenerDatosJuegoActuales(): DatosJuego {
+    fun obtenerDatosJuegoActuales(): DatosJuego {
         val idJugadorTurnoActual = jugadores[posJugadorActual].idUsuario
         return DatosJuego(
             dora = arrayListOf(),
@@ -126,42 +126,34 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
 
         val cantidadOportunidades = jugadores[posJugadorActual].descartarCarta(cartaDescartada)
 
-        if (cantidadOportunidades > 0) {
-            // Enviar datos
-            enviarDatosATodos()
-        } else {
-            cambiarTurnoSigJugadorConsecutivo()
+        when {
+            cantidadOportunidades > 0 -> {
+                // Enviar datos
+                enviarDatosATodos()
+            }
+            cantidadOportunidades == 0 -> {
+                cambiarTurnoSigJugadorConsecutivo()
 
-            // Actualizar dora
-            gestorDora.actualizarDora()
+                // Actualizar dora
+                gestorDora.actualizarDora()
 
-            // Enviar datos
-            enviarDatosATodos()
+                // Enviar datos
+                enviarDatosATodos()
+            }
+            else -> {
+                System.err.println("Se intento descartar en un estado invalido.")
+            }
         }
     }
 
-    // TODO: Usar diferente metodo para ignorar oportunidad Tsumo
-    suspend fun ignorarOportunidadSeq(idUsuario: String) {
-
-        var aunHayOportunidades = false
-        oportunidadesRestantes--
-
-        for ((id, mano) in manos) {
-            // Eliminar oportunidad del usuario
-            if (id == idUsuario) {
-                mano.oportunidades = arrayListOf()
-                enviarDatos(id, conexiones[id]!!)
-                continue
-            }
-
-            // Si algun otro jugador tiene una oportunidad
-            if (mano.oportunidades.isNotEmpty()) {
-                aunHayOportunidades = true
-            }
-        }
+    suspend fun ignorarOportunidades(idUsuario: String) {
+        val jugador = jugadores.find { it.idUsuario == idUsuario } ?: return
+        val aunHayOportunidades = jugador.ignorarOportunidades()
 
         // Si no quedan oportunidades cambiar el turno al sig jugador
-        if (!aunHayOportunidades) {
+        if (aunHayOportunidades) {
+            jugador.enviarDatos(obtenerDatosJuegoActuales())
+        } else {
             cambiarTurnoSigJugadorConsecutivo()
 
             // Actualizar dora

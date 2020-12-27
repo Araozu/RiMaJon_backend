@@ -2,7 +2,6 @@ package dev.araozu
 
 import dev.araozu.juego.Juego
 import io.ktor.http.cio.websocket.*
-import kotlinx.coroutines.isActive
 
 object GestorJuegos {
 
@@ -84,7 +83,7 @@ object GestorJuegos {
 
     suspend fun manejarIgnorarOportunidad(idJuego: String, idUsuario: String) {
         val juego = juegos[idJuego]!!
-        juego.ignorarOportunidadSeq(idUsuario)
+        juego.ignorarOportunidades(idUsuario)
     }
 
     suspend fun manejarLlamarSeq(idJuego: String, idUsuario: String, cartaDescartada: Int, combinacion: Pair<Int, Int>) {

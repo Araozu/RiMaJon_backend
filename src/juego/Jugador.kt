@@ -80,6 +80,18 @@ sealed class Jugador(val juego: Juego, val idUsuario: String) {
         return oportunidadesRestantes
     }
 
+    /**
+     * Limpia las oportunidades del jugador y verifica si algun otro jugador tiene alguna oportunidad
+     * @return Si otro jugador tiene alguna oportunidad
+     */
+    fun ignorarOportunidades(): Boolean {
+        mano.oportunidades.clear()
+
+        return null != juego.jugadores.find {
+            it !== this && it.mano.oportunidades.size > 0
+        }
+    }
+
     abstract fun verificarTsumo()
 
 }
