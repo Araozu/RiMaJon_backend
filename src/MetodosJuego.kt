@@ -18,7 +18,7 @@ fun Routing.crearJuego() {
             sigId = GestorJuegos.generarId()
         }
 
-        val juego = Juego(arrayListOf())
+        val juego = Juego(sigId)
         GestorJuegos.juegos[sigId] = juego
 
         call.respondText("{\"id\": \"$sigId\"}", contentType = ContentType.Application.Json)

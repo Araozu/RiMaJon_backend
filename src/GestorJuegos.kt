@@ -56,14 +56,17 @@ object GestorJuegos {
         broadcast(juego, mensaje)
 
         var str = "["
-        for ((idUsuarioAct, _) in juego.usuarios) {
-            val nombreUsuarioAct = GestorUsuarios.obtenerNombreUsuario(idUsuarioAct)
+        for (jugador in juego.jugadores) {
+            val nombreUsuarioAct =
+                if (jugador.idUsuario.startsWith("Bot")) jugador.idUsuario
+                else GestorUsuarios.obtenerNombreUsuario(jugador.idUsuario)
+
             if (str.length != 1) str += ","
-            str += "{\"idUsuario\": \"$idUsuarioAct\", \"nombreUsuario\": \"$nombreUsuarioAct\"}"
+            str += "{\"idUsuario\": \"${jugador.idUsuario}\", \"nombreUsuario\": \"$nombreUsuarioAct\"}"
         }
         str += "]"
+
         juego.agregarConexion(idUsuario, ws)
-        juego.agregarUsuario(idUsuario)
         ws.send(Frame.Text("{\"operacion\": \"conexion_exitosa\", \"jugadores\": $str}"))
     }
 

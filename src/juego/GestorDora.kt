@@ -3,7 +3,7 @@ package dev.araozu.juego
 class GestorDora(cartasIniciales: Array<Int>) {
 
     private val cartas = Array(5) {-1}
-    val dora = arrayListOf(cartas[0])
+    val dora: ArrayList<Int>
     private var turnosSigDora = 20
     var turnosRestantesDora = turnosSigDora // 20 15 10 5
         private set
@@ -12,6 +12,7 @@ class GestorDora(cartasIniciales: Array<Int>) {
         for (i in 0 until 5) {
             cartas[i] = cartasIniciales[i]
         }
+        dora = arrayListOf(cartas[0])
     }
 
     operator fun component1(): ArrayList<Int> {

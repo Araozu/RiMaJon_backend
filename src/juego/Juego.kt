@@ -3,11 +3,13 @@ package dev.araozu.juego
 import dev.araozu.*
 import io.ktor.http.cio.websocket.*
 
-class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
+class Juego(val idJuego: String) {
 
     private val cartas: Array<Int> = GestorJuegos.generarCartas()
 
-    internal var jugadores = Array<Jugador>(4) { JugadorBot(this, "Bot $it") }
+    internal var jugadores = Array<Jugador>(4) {
+        JugadorBot(this, GestorUsuarios.crearUsuario("Bot $it - $idJuego"))
+    }
     private var ordenJugadores = Array(4) { jugadores[it].idUsuario }
 
     private var gestorDora = GestorDora(cartas)
@@ -22,13 +24,17 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
 
         estadoJuego = EstadoJuego.Iniciado
 
-        val nuevoArrJugadores = Array<Jugador>(4) { JugadorBot(this, "-") }
+        val nuevoArrJugadores = Array<Jugador>(4) {
+            JugadorBot(this, GestorUsuarios.crearUsuario("Bot init $it - $idJuego"))
+        }
         val jugadoresRestantes = arrayListOf(0, 1, 2, 3)
 
+        // TODO: Logica erronea
         for (i in 0 until 4) {
             val nuevoIndice = (Math.random() * jugadoresRestantes.size).toInt()
-            nuevoArrJugadores[i] = jugadores[nuevoIndice]
-            jugadoresRestantes.remove(nuevoIndice)
+            val nuevaPosicion = jugadoresRestantes[nuevoIndice]
+            nuevoArrJugadores[i] = jugadores[nuevaPosicion]
+            jugadoresRestantes.removeAt(nuevoIndice)
         }
 
         dragonPartida = Dragon.get((Math.random() * 4).toInt())
@@ -47,12 +53,25 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
 
         jugadores = nuevoArrJugadores
         ordenJugadores = Array(4) { jugadores[it].idUsuario }
+
+
+        // Dar carta al primer jugador y empezar el juego
+        val sigCarta = cartas[posCartaActual]
+        posCartaActual++
+
+        // Asignar carta
+        jugadores[posJugadorActual].recibirCarta(sigCarta)
+        // Verificar Tsumo
+        jugadores[posJugadorActual].verificarTsumo()
+
+        enviarDatosATodos()
     }
 
     private fun obtenerDatosJuegoActuales(): DatosJuego {
         val idJugadorTurnoActual = jugadores[posJugadorActual].idUsuario
+        // TODO: Agregar EstadoJuego
         return DatosJuego(
-            dora = arrayListOf(),
+            dora = gestorDora.dora,
             manos = hashMapOf(),
             cartasRestantes = 108 - posCartaActual,
             ordenJugadores = ordenJugadores,
@@ -70,8 +89,6 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
     }
 
     suspend fun agregarConexion(idUsuario: String, conexion: WebSocketSession) {
-        if (estadoJuego != EstadoJuego.Espera) return
-
         // Buscar si el jugador ya existia
         jugadores.forEach {
             if (it.idUsuario == idUsuario) {
@@ -81,18 +98,17 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
             }
         }
 
-        // El jugador es nuevo. Asignarlo.
+        // El jugador es nuevo. Verificar que aun se este en la sala
+        if (estadoJuego != EstadoJuego.Espera) return
+
+        // Asignarlo.
         val nuevoJugador = JugadorHumano(this, idUsuario, conexion)
         for (i in 0 until 4) {
-            if (jugadores[i] !is JugadorBot) {
+            if (jugadores[i] is JugadorBot) {
                 jugadores[i] = nuevoJugador
                 break
             }
         }
-    }
-
-    fun agregarUsuario(idUsuario: String) {
-        if (estadoJuego == EstadoJuego.Espera) usuarios.add(Pair(idUsuario, true))
     }
 
     private fun cambiarTurnoSigJugadorConsecutivo() {

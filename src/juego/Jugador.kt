@@ -178,14 +178,14 @@ class JugadorBot(juego: Juego, idUsuario: String) : Jugador(juego, idUsuario) {
     override fun actualizarConexion(ws: WebSocketSession) {}
 
     override suspend fun enviarDatos(datos: DatosJuego) {
-        println("Bot pensando")
+        println("Bot $idUsuario pensando")
 
         // Si el bot tiene una carta adicional
         if (mano.sigCarta != 1) {
             // Espera 1s y la descarta
             GlobalScope.launch {
                 delay(1000)
-                println("Bot descartando la carta que recibio")
+                println("Bot $idUsuario descartando la carta que recibio")
                 juego.manejarDescarte(idUsuario, mano.sigCarta)
             }
         }
@@ -195,7 +195,7 @@ class JugadorBot(juego: Juego, idUsuario: String) : Jugador(juego, idUsuario) {
             // Espera 1s e ignora oportunidades
             GlobalScope.launch {
                 delay(1000)
-                println("Bot ignorando sus oportunidades")
+                println("Bot $idUsuario ignorando sus oportunidades")
                 juego.ignorarOportunidades(idUsuario)
             }
         }
