@@ -8,8 +8,8 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
     private val cartas: Array<Int> = GestorJuegos.generarCartas()
 
     internal var jugadores = Array<Jugador>(4) { JugadorBot(this, "Bot $it") }
+    private var ordenJugadores = Array(4) { jugadores[it].idUsuario }
 
-    private val ordenJugadores = Array(4) { "" }
     private var gestorDora = GestorDora(cartas)
     private var estadoJuego = EstadoJuego.Espera
     private var posCartaActual = 10
@@ -17,55 +17,40 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
     private var dragonPartida = Dragon.Negro
     private var oportunidadesRestantes = 0
 
-    suspend fun iniciarJuego(ws: WebSocketSession) {
+    suspend fun iniciarJuego() {
         if (estadoJuego != EstadoJuego.Espera) return
-
-        if (conexiones.size < 4) {
-            ws.send(Frame.Text("{\"operacion\": \"error\", \"razon\": \"Usuarios insuficientes\"}"))
-            return
-        }
 
         estadoJuego = EstadoJuego.Iniciado
 
-        // Asignar orden de jugadores
-        var i = 0
-        val posInicio = (Math.random() * 4).toInt()
-        conexiones.forEach { (idUsuario, _) ->
-            ordenJugadores[i] = idUsuario
-            val dragonActual = Dragon.get(i)
+        val nuevoArrJugadores = Array<Jugador>(4) { JugadorBot(this, "-") }
+        val jugadoresRestantes = arrayListOf(0, 1, 2, 3)
 
+        for (i in 0 until 4) {
+            val nuevoIndice = (Math.random() * jugadoresRestantes.size).toInt()
+            nuevoArrJugadores[i] = jugadores[nuevoIndice]
+            jugadoresRestantes.remove(nuevoIndice)
+        }
+
+        dragonPartida = Dragon.get((Math.random() * 4).toInt())
+
+        for ((i, jugador) in nuevoArrJugadores.withIndex()) {
             val cartasL = arrayListOf<Int>()
-
             for (j in posCartaActual until (posCartaActual + 10)) {
                 cartasL.add(cartas[j])
             }
             posCartaActual += 10
 
-            val mano = if (i == posInicio) {
-                val sigCarta = cartas[posCartaActual]
-                posCartaActual++
-                gestorDora.actualizarDora()
-                dragonPartida = dragonActual
-                posJugadorActual = i
-
-                Mano(cartasL, sigCarta = sigCarta, dragon = dragonActual)
-            } else {
-                Mano(cartasL, dragon = dragonActual)
-            }
-
-            manos[idUsuario] = mano
-            i++
+            jugador.inicializarCartas(cartasL)
+            jugador.inicializarDragon(Dragon.get(i))
+            jugador.send(Frame.Text("{\"operacion\": \"juego_iniciado\"}"))
         }
 
-        conexiones.forEach { (_, socket) ->
-            socket.send(Frame.Text("{\"operacion\": \"juego_iniciado\"}"))
-        }
-
-        conexiones.clear()
+        jugadores = nuevoArrJugadores
+        ordenJugadores = Array(4) { jugadores[it].idUsuario }
     }
 
     private fun obtenerDatosJuegoActuales(): DatosJuego {
-        val idJugadorTurnoActual = ordenJugadores[posJugadorActual]
+        val idJugadorTurnoActual = jugadores[posJugadorActual].idUsuario
         return DatosJuego(
             dora = arrayListOf(),
             manos = hashMapOf(),
@@ -85,6 +70,8 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
     }
 
     suspend fun agregarConexion(idUsuario: String, conexion: WebSocketSession) {
+        if (estadoJuego != EstadoJuego.Espera) return
+
         // Buscar si el jugador ya existia
         jugadores.forEach {
             if (it.idUsuario == idUsuario) {
@@ -113,95 +100,33 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
         posJugadorActual = (posJugadorActual + 1) % 4
         oportunidadesRestantes = 0
 
-        val idSigUsuario = ordenJugadores[posJugadorActual]
+        // Si se acabaron las cartas
+        if (posCartaActual >= cartas.size) {
+            estadoJuego = EstadoJuego.Terminado
+            return
+        }
 
-        // Extraer sig carta. TODO: Verificar que no quedan cartas y establecer empate
+        // Sino
         val sigCarta = cartas[posCartaActual]
         posCartaActual++
 
-        // Asignar nueva carta
-        val manoSigJugador = manos[idSigUsuario]!!
-        manoSigJugador.sigCarta = sigCarta
-
-        // TODO: Arreglar. Roto.
-        val oportunidadWin = OportunidadWin.verificar(sigCarta, manoSigJugador.cartas, manoSigJugador.cartasReveladas)
-        if (oportunidadWin != null) {
-            manoSigJugador.oportunidades.add(oportunidadWin)
-        }
-
+        // Asignar carta
+        jugadores[posJugadorActual].recibirCarta(sigCarta)
+        // Verificar Tsumo
+        jugadores[posJugadorActual].verificarTsumo()
     }
 
-    private fun esUsuarioIzq(idUsuarioIzq: String, idUsuario1: String): Boolean {
-        var posUsuario1 = 0
-        var posUsuarioIzq = 0
-        for ((posActual, idUsuario) in ordenJugadores.withIndex()) {
-            if (idUsuario == idUsuario1) posUsuario1 = posActual
-            if (idUsuario == idUsuarioIzq) posUsuarioIzq = posActual
-        }
-        return (posUsuarioIzq + 1) % 4 == posUsuario1
-    }
-
-    suspend fun manejarDescarte(idUsuario: String, carta: Int) {
-        if (ordenJugadores[posJugadorActual] != idUsuario) return
+    suspend fun manejarDescarte(idUsuario: String, cartaDescartada: Int) {
+        // Si un jugador del que no es turno intenta descartar
+        if (jugadores[posJugadorActual].idUsuario != idUsuario) return
 
         // Si el jugador del turno actual ya descarto, otros jugadores tienen oportunidades
         // e intento descartar de nuevo
         if (oportunidadesRestantes > 0) return
 
-        val m = manos[idUsuario]!!
+        val cantidadOportunidades = jugadores[posJugadorActual].descartarCarta(cartaDescartada)
 
-        if (m.sigCarta == carta) {
-            m.sigCarta = -1
-        } else {
-            val posCarta = m.cartas.indexOf(carta)
-            if (posCarta != -1) {
-                m.cartas.removeAt(posCarta)
-
-                // Tras llamar un Seq/Tri el jugador no tiene una carta adicional en su mano.
-                if (m.sigCarta != -1) m.cartas.add(m.sigCarta)
-
-                m.sigCarta = -1
-            } else {
-                return
-            }
-        }
-
-        m.descartes.add(carta)
-
-        // Verificar seq/tri/win
-        var hayOportunidades = false
-        for ((idUsuarioActual, mano) in manos) {
-            // No buscar oportunidades en el usuario que acaba de descartar.
-            if (idUsuarioActual == idUsuario) continue
-
-            // Solo verificar seq en el jugador a la derecha del que descarto
-            if (esUsuarioIzq(idUsuario, idUsuarioActual)) {
-                val oportunidadSeq = OportunidadSeq.verificar(carta, mano.cartas)
-                if (oportunidadSeq != null) {
-                    hayOportunidades = true
-                    oportunidadesRestantes++
-                    mano.oportunidades.add(oportunidadSeq)
-                }
-            }
-
-            // Oportunidades tri
-            val oportunidadTri = OportunidadTri.verificar(carta, mano.cartas)
-            if (oportunidadTri != null) {
-                hayOportunidades = true
-                oportunidadesRestantes++
-                mano.oportunidades.add(oportunidadTri)
-            }
-
-            // Oportunidades win (ron)
-            val oportunidadWin = OportunidadWin.verificar(carta, mano.cartas, mano.cartasReveladas)
-            if (oportunidadWin != null) {
-                hayOportunidades = true
-                oportunidadesRestantes++
-                mano.oportunidades.add(oportunidadWin)
-            }
-        }
-
-        if (hayOportunidades) {
+        if (cantidadOportunidades > 0) {
             // Enviar datos
             enviarDatosATodos()
         } else {
