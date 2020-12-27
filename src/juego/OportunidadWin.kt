@@ -191,7 +191,7 @@ class OportunidadWin(override val cartaDescartada: Int, val yaku: ArrayList<Yaku
             // Obtener yaku
             val yaku = obtenerListaYakus(contenedorGrupos, esManoAbierta)
 
-            return OportunidadWin(valorCarta, yaku)
+            return if (yaku.isNotEmpty()) OportunidadWin(valorCarta, yaku) else null
         }
 
     }

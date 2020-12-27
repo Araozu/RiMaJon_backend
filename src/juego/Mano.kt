@@ -43,6 +43,7 @@ data class Mano(
                 // Incluir la carta entrante a la mano del jugador
                 if (sigCarta != -1) {
                     cartas.add(sigCarta)
+                    sigCarta = -1
                 }
             } else {
                 System.err.println("Error al descartar carta: El jugador no tiene dicha carta.")

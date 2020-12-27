@@ -6,6 +6,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
 
 sealed class Jugador(val juego: Juego, val idUsuario: String) {
 
@@ -151,7 +152,7 @@ class JugadorHumano(juego: Juego, idUsuario: String, private var ws: WebSocketSe
             if (it === this) {
                 manos[idUsuario] = this.mano
             } else {
-                manos[it.idUsuario] = it.mano
+                manos[it.idUsuario] = it.mano.obtenerManoPrivada()
             }
         }
 
@@ -170,6 +171,8 @@ class JugadorHumano(juego: Juego, idUsuario: String, private var ws: WebSocketSe
 class JugadorBot(juego: Juego, idUsuario: String) : Jugador(juego, idUsuario) {
 
     override val isActive: Boolean = true
+    private val mutexDescarte = Mutex()
+    private val mutexOportunidad = Mutex()
 
     override suspend fun send(v: Frame.Text) {
         println("Datos enviados a bot, pero ignorados.")
@@ -181,12 +184,14 @@ class JugadorBot(juego: Juego, idUsuario: String) : Jugador(juego, idUsuario) {
         println("Bot $idUsuario pensando")
 
         // Si el bot tiene una carta adicional
-        if (mano.sigCarta != 1) {
+        if (mano.sigCarta != -1) {
             // Espera 1s y la descarta
             GlobalScope.launch {
+                mutexDescarte.lock()
                 delay(1000)
-                println("Bot $idUsuario descartando la carta que recibio")
+                println("Bot $idUsuario descartando la carta que recibio (${mano.sigCarta})")
                 juego.manejarDescarte(idUsuario, mano.sigCarta)
+                mutexDescarte.unlock()
             }
         }
 
@@ -194,9 +199,11 @@ class JugadorBot(juego: Juego, idUsuario: String) : Jugador(juego, idUsuario) {
         if (mano.oportunidades.size > 0) {
             // Espera 1s e ignora oportunidades
             GlobalScope.launch {
+                mutexOportunidad.lock()
                 delay(1000)
-                println("Bot $idUsuario ignorando sus oportunidades")
+                println("Bot $idUsuario ignorando sus oportunidades (${mano.oportunidades.size}")
                 juego.ignorarOportunidades(idUsuario)
+                mutexOportunidad.unlock()
             }
         }
 
