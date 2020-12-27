@@ -172,20 +172,33 @@ class JugadorBot(juego: Juego, idUsuario: String) : Jugador(juego, idUsuario) {
     override val isActive: Boolean = true
 
     override suspend fun send(v: Frame.Text) {
-        println("Bot pensando...")
-        TODO("Bot no implementado D:")
+        println("Datos enviados a bot, pero ignorados.")
     }
 
     override fun actualizarConexion(ws: WebSocketSession) {}
 
     override suspend fun enviarDatos(datos: DatosJuego) {
-        // Si es turno del bot
-        GlobalScope.launch {
-            delay(1000)
+        println("Bot pensando")
+
+        // Si el bot tiene una carta adicional
+        if (mano.sigCarta != 1) {
+            // Espera 1s y la descarta
+            GlobalScope.launch {
+                delay(1000)
+                println("Bot descartando la carta que recibio")
+                juego.manejarDescarte(idUsuario, mano.sigCarta)
+            }
         }
 
-        // Si el bot tiene una oportunidad
-
+        // Si el bot tiene oportunidades
+        if (mano.oportunidades.size > 0) {
+            // Espera 1s e ignora oportunidades
+            GlobalScope.launch {
+                delay(1000)
+                println("Bot ignorando sus oportunidades")
+                juego.ignorarOportunidades(idUsuario)
+            }
+        }
 
     }
 
