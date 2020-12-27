@@ -43,8 +43,8 @@ object GestorJuegos {
     }
 
     private suspend fun broadcast(juego: Juego, mensaje: String) {
-        juego.conexiones.forEach { (_, socket) ->
-            if (socket.isActive) socket.send(Frame.Text(mensaje))
+        juego.jugadores.forEach {
+            if (it.isActive) it.send(Frame.Text(mensaje))
         }
     }
 
@@ -70,7 +70,7 @@ object GestorJuegos {
     suspend fun iniciarJuego(idJuego: String, ws: WebSocketSession) {
         val juego = juegos[idJuego]
         if (juego != null) {
-            juego.iniciarJuego(ws)
+            juego.iniciarJuego()
         } else {
             ws.send(Frame.Text("{\"operacion\": \"error\", \"razon\": \"Juego invalido\"}"))
         }

@@ -49,7 +49,7 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
         ordenJugadores = Array(4) { jugadores[it].idUsuario }
     }
 
-    fun obtenerDatosJuegoActuales(): DatosJuego {
+    private fun obtenerDatosJuegoActuales(): DatosJuego {
         val idJugadorTurnoActual = jugadores[posJugadorActual].idUsuario
         return DatosJuego(
             dora = arrayListOf(),
@@ -174,42 +174,21 @@ class Juego(val usuarios: ArrayList<Pair<String, Boolean>>) {
     }
 
     suspend fun manejarSeqTri(idUsuario: String, cartaDescartada: Int, combinacion: Pair<Int, Int>) {
-        val manoJugadorDescarte = manos[ordenJugadores[posJugadorActual]]!!
-        val descartesJ = manoJugadorDescarte.descartes
+        val jugadorOportunidad = jugadores.find { it.idUsuario == idUsuario } ?: return
+        val jugadorDescate = jugadores[posJugadorActual]
 
-        // La carta solicitada para robar es invalida
-        if (descartesJ[descartesJ.size - 1] != cartaDescartada) {
-            println("La carta a robar es invalida")
+        val roboExitoso = jugadorOportunidad.manejarTriSeq(jugadorDescate, cartaDescartada, combinacion)
+
+        if (!roboExitoso) {
             return
         }
 
-        descartesJ.removeAt(descartesJ.size - 1)
-
-        val manoRobador = manos[idUsuario]!!
-        val cartasRobador = manoRobador.cartas
-        val (vCarta1, vCarta2) = combinacion
-
-        // El jugador no tiene las cartas con las que formar seq
-        if (!cartasRobador.contains(vCarta1) || !cartasRobador.contains(vCarta2)) {
-            println("El jugador no tiene las cartas que dice que tiene: $vCarta1, $vCarta2")
-            return
-        }
-
-        // Quitar cartas de la mano y moverlas a cartas reveladas
-        cartasRobador.remove(vCarta1)
-        cartasRobador.remove(vCarta2)
-        val seq = arrayListOf(cartaDescartada, vCarta1, vCarta2)
-        seq.sort()
-        manoRobador.cartasReveladas.add(seq)
-
-        // Eliminar las oportunidades
-        manoRobador.oportunidades = arrayListOf()
-        oportunidadesRestantes = 0
+        // Eliminar oportunidades del resto. TODO: Implementar prioridad: Win -> Tri -> Seq
+        jugadores.forEach { it.ignorarOportunidades() }
 
         // Cambiar turno al robador sin dar carta
         // turnoActual = (turnoActual + 1) % 4
         cambiarTurnoSegunIdUsuario(idUsuario)
-
         enviarDatosATodos()
     }
 

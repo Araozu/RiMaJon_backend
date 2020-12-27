@@ -92,6 +92,41 @@ sealed class Jugador(val juego: Juego, val idUsuario: String) {
         }
     }
 
+    fun manejarTriSeq(jugadorDescarte: Jugador, cartaARobar: Int, combinacion: Pair<Int, Int>): Boolean {
+        // Este jugador es el que roba
+
+        if (!jugadorDescarte.ultimaCartaDescartadaEs(cartaARobar)) {
+            System.err.println("Un jugador intento robar una carta no descartada")
+            return false
+        }
+
+        val (vCarta1, vCarta2) = combinacion
+
+        // El robador no tiene las cartas con las que formar seq
+        if (!mano.cartas.contains(vCarta1) || !mano.cartas.contains(vCarta2)) {
+            System.err.println("El jugador no tiene las cartas que dice que tiene: $vCarta1, $vCarta2")
+            return false
+        }
+
+        // Quitar cartas de la mano y moverlas a cartas reveladas
+        mano.cartas.remove(vCarta1)
+        mano.cartas.remove(vCarta2)
+        val grupoAbierto = arrayListOf(cartaARobar, vCarta1, vCarta2)
+        grupoAbierto.sort()
+        mano.cartasReveladas.add(grupoAbierto)
+
+        jugadorDescarte.eliminarUltimaCartaDescartada()
+
+        return true
+    }
+
+    private fun ultimaCartaDescartadaEs(carta: Int): Boolean =
+        mano.descartes[mano.descartes.size - 1] == carta
+
+    private fun eliminarUltimaCartaDescartada() {
+        mano.descartes.removeAt(mano.descartes.size - 1)
+    }
+
     abstract fun verificarTsumo()
 
 }
