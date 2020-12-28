@@ -3,7 +3,7 @@ package dev.araozu.juego
 import dev.araozu.juego.yaku.Yaku
 import dev.araozu.juego.yaku.obtenerListaYakus
 
-class OportunidadWin(override val cartaDescartada: Int, val yaku: ArrayList<Yaku>) : Oportunidad {
+class OportunidadRon(override val cartaDescartada: Int, val yaku: ArrayList<Yaku>) : Oportunidad {
 
     override val nombreOportunidad = "Win"
 
@@ -148,7 +148,11 @@ class OportunidadWin(override val cartaDescartada: Int, val yaku: ArrayList<Yaku
             return if (valorCont1 > valorCont2) contenedor1 else contenedor2
         }
 
-        fun verificar(valorCarta: Int, cartasMano: ArrayList<Int>, gruposAbiertos: ArrayList<ArrayList<Int>>): OportunidadWin? {
+        fun verificar(
+            valorCarta: Int,
+            cartasMano: ArrayList<Int>,
+            gruposAbiertos: ArrayList<ArrayList<Int>> = arrayListOf()
+        ): OportunidadRon? {
             val narrl = ArrayList<Int>(cartasMano.size + 1)
             narrl.addAll(cartasMano)
             narrl.add(valorCarta)
@@ -191,7 +195,7 @@ class OportunidadWin(override val cartaDescartada: Int, val yaku: ArrayList<Yaku
             // Obtener yaku
             val yaku = obtenerListaYakus(contenedorGrupos, esManoAbierta)
 
-            return if (yaku.isNotEmpty()) OportunidadWin(valorCarta, yaku) else null
+            return if (yaku.isNotEmpty()) OportunidadRon(valorCarta, yaku) else null
         }
 
     }

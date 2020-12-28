@@ -40,4 +40,5 @@ dependencies {
     implementation "io.ktor:ktor-gson:$ktor_version"
     implementation 'com.google.code.gson:gson:2.8.5'
     testImplementation "io.ktor:ktor-server-tests:$ktor_version"
+    testImplementation 'io.kotest:kotest-runner-junit5:$version'
 }

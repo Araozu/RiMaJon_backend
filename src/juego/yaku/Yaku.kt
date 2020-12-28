@@ -3,34 +3,38 @@ package dev.araozu.juego.yaku
 import dev.araozu.juego.ContenedorGrupos
 
 enum class Yaku {
-    // 15
+    // 10
     DragonesFull,
     Verde,
 
-    // 10
+    // 7
     RealezaDragones,
     RealezaFull,
+    EscaleraPerfecta,
+    A10,
 
     // 5
-    TripleTriplesCerrados,
     EscaleraFull,
+
+    // 3
+    TripleTriplesCerrados,
     Exterior,
 
-    // 4
+    // 2
     Escalera,
-    TripleCuadruples,
     Negro,
     Rojo,
     SemiExterior,
+    DobleSecuenciaPura,
 
-    // 3
-    ParUnico,
+    // 1
     Dragones,
     Interior,
     TripleTriples,
-    TripleSecuenciaCerrada,
     Realeza,
-    DobleSecuenciaPura
+    Variedad,
+    DobleSecuencia,
+    ManoCompletamenteCerrada
 }
 
 fun obtenerListaYakus(contenedorGrupos: ContenedorGrupos, esManoAbierta: Boolean): ArrayList<Yaku> {
@@ -45,7 +49,7 @@ fun obtenerListaYakus(contenedorGrupos: ContenedorGrupos, esManoAbierta: Boolean
         return arrayListOf()
     }
 
-    // 15 puntos
+    // 10 puntos
     if (yakuDragonesFull(contenedorGrupos)) {
         listaYakus.add(Yaku.DragonesFull)
         return listaYakus
@@ -55,7 +59,7 @@ fun obtenerListaYakus(contenedorGrupos: ContenedorGrupos, esManoAbierta: Boolean
         return listaYakus
     }
 
-    // 10 puntos
+    // 7 puntos
     if (yakuRealezaDragones(contenedorGrupos)) {
         listaYakus.add(Yaku.RealezaDragones)
         return listaYakus
@@ -66,6 +70,9 @@ fun obtenerListaYakus(contenedorGrupos: ContenedorGrupos, esManoAbierta: Boolean
     }
 
     // 5 puntos
+    // TODO
+
+    // 3 puntos
     if (yakuExterior(contenedorGrupos)) {
         listaYakus.add(Yaku.Exterior)
     }
@@ -84,7 +91,7 @@ fun obtenerListaYakus(contenedorGrupos: ContenedorGrupos, esManoAbierta: Boolean
         verificarTripleTriples = false
     }
 
-    // 4 puntos
+    // 2 puntos
     if (yakuSemiExterior(contenedorGrupos)) {
         listaYakus.add(Yaku.SemiExterior)
     }
@@ -94,23 +101,17 @@ fun obtenerListaYakus(contenedorGrupos: ContenedorGrupos, esManoAbierta: Boolean
     if (yakuNegro(contenedorGrupos)) {
         listaYakus.add(Yaku.Negro)
     }
-    if (yakuTripleCuadruples(contenedorGrupos)) {
-        listaYakus.add(Yaku.TripleCuadruples)
-    }
     if (verificarEscalera && yakuEscalera(contenedorGrupos)) {
         listaYakus.add(Yaku.Escalera)
     }
 
-    // 3 puntos
-    if (yakuDobleSecuenciaPura(contenedorGrupos)) {
-        listaYakus.add(Yaku.DobleSecuenciaPura)
+    // 1 punto
+    if (yakuDobleSecuencia(contenedorGrupos)) {
+        listaYakus.add(Yaku.DobleSecuencia)
     }
     val cantidad = yakuRealeza(contenedorGrupos)
     if (cantidad > 0) {
         listaYakus.add(Yaku.Realeza)
-    }
-    if (!esManoAbierta && yakuTripleSecuenciaCerrada(contenedorGrupos)) {
-        listaYakus.add(Yaku.TripleSecuenciaCerrada)
     }
     if (verificarTripleTriples && yakuTripleTriples(contenedorGrupos)) {
         listaYakus.add(Yaku.TripleTriples)
@@ -121,9 +122,6 @@ fun obtenerListaYakus(contenedorGrupos: ContenedorGrupos, esManoAbierta: Boolean
     val cantidadDragon = yakuDragones(contenedorGrupos)
     if (cantidadDragon > 0) {
         listaYakus.add(Yaku.Dragones)
-    }
-    if (yakuParUnico(contenedorGrupos)) {
-        listaYakus.add(Yaku.ParUnico)
     }
 
     return listaYakus

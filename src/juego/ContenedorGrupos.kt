@@ -12,8 +12,7 @@ class ContenedorGrupos(
         arrayListOf<ArrayList<Carta>>(),
         arrayListOf<ArrayList<Carta>>(),
         arrayListOf<Carta>()
-    ) {
-    }
+    )
 
     fun agregarDesdeContenedor(c: ContenedorGrupos) {
         tris.addAll(c.tris)

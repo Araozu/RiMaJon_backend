@@ -3,6 +3,11 @@ package dev.araozu.juego.yaku
 import dev.araozu.juego.CartaNumero
 import dev.araozu.juego.ContenedorGrupos
 
+internal fun yakuDobleSecuenciaPura(contenedorGrupos: ContenedorGrupos): Boolean {
+
+    return false
+}
+
 internal fun yakuSemiExterior(contenedorGrupos: ContenedorGrupos): Boolean {
 
     for (carrl in contenedorGrupos.seqs) {
@@ -79,17 +84,6 @@ internal fun yakuNegro(contenedorGrupos: ContenedorGrupos): Boolean {
         for (c in carrl) {
             if (!c.esCartaNegra()) return false
         }
-    }
-
-    return true
-}
-
-internal fun yakuTripleCuadruples(contenedorGrupos: ContenedorGrupos): Boolean {
-
-    if (contenedorGrupos.tris.size != 3) return false
-
-    for (triple in contenedorGrupos.tris) {
-        if (triple.size != 4) return false
     }
 
     return true
