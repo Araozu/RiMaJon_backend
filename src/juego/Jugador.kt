@@ -7,6 +7,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.time.delay
 
 sealed class Jugador(val juego: Juego, val idUsuario: String) {
 
@@ -69,10 +70,10 @@ sealed class Jugador(val juego: Juego, val idUsuario: String) {
             }
 
             // Oportunidades win (ron)
-            val oportunidadWin = OportunidadWin.verificar(cartaDescartada, mano.cartas, mano.cartasReveladas)
-            if (oportunidadWin != null) {
+            val oportunidadRon = OportunidadRon.verificar(cartaDescartada, mano.cartas, mano.cartasReveladas)
+            if (oportunidadRon != null) {
                 hayOportunidad = true
-                mano.oportunidades.add(oportunidadWin)
+                mano.oportunidades.add(oportunidadRon)
             }
 
             if (hayOportunidad) oportunidadesRestantes++
@@ -119,6 +120,17 @@ sealed class Jugador(val juego: Juego, val idUsuario: String) {
         jugadorDescarte.eliminarUltimaCartaDescartada()
 
         return true
+    }
+
+    fun manejarRon(cartaDescartada: Int): Boolean {
+
+        // Verificar que el jugador tenga la oportunidad
+
+        // Verificar que la carta descartada sea correcta
+
+        // Verificar los yaku
+
+        return false
     }
 
     private fun ultimaCartaDescartadaEs(carta: Int): Boolean =
@@ -175,21 +187,20 @@ class JugadorBot(juego: Juego, idUsuario: String) : Jugador(juego, idUsuario) {
     private val mutexOportunidad = Mutex()
 
     override suspend fun send(v: Frame.Text) {
-        println("Datos enviados a bot, pero ignorados.")
+
     }
 
     override fun actualizarConexion(ws: WebSocketSession) {}
 
     override suspend fun enviarDatos(datos: DatosJuego) {
-        println("Bot $idUsuario pensando")
 
         // Si el bot tiene una carta adicional
         if (mano.sigCarta != -1) {
             // Espera 1s y la descarta
             GlobalScope.launch {
                 mutexDescarte.lock()
-                delay(1000)
-                println("Bot $idUsuario descartando la carta que recibio (${mano.sigCarta})")
+                delay((Math.random() * 5 + 1).toLong() * 1000)
+
                 juego.manejarDescarte(idUsuario, mano.sigCarta)
                 mutexDescarte.unlock()
             }
@@ -200,8 +211,8 @@ class JugadorBot(juego: Juego, idUsuario: String) : Jugador(juego, idUsuario) {
             // Espera 1s e ignora oportunidades
             GlobalScope.launch {
                 mutexOportunidad.lock()
-                delay(1000)
-                println("Bot $idUsuario ignorando sus oportunidades (${mano.oportunidades.size}")
+                delay((Math.random() * 5 + 1).toLong() * 1000)
+
                 juego.ignorarOportunidades(idUsuario)
                 mutexOportunidad.unlock()
             }
@@ -210,7 +221,7 @@ class JugadorBot(juego: Juego, idUsuario: String) : Jugador(juego, idUsuario) {
     }
 
     override fun verificarTsumo() {
-        System.err.println("Tsumo no implementado D:")
+
     }
 
 }

@@ -208,4 +208,15 @@ class Juego(val idJuego: String) {
         enviarDatosATodos()
     }
 
+    suspend fun manejarRon(idUsuario: String, cartaDescartada: Int) {
+        val jugadorRon = jugadores.find { it.idUsuario == idUsuario } ?: return
+        val jugadorDescate = jugadores[posJugadorActual]
+
+        val ronExitoso = jugadorRon.manejarRon(cartaDescartada)
+
+        if (!ronExitoso) return
+
+        estadoJuego = EstadoJuego.Terminado
+    }
+
 }
