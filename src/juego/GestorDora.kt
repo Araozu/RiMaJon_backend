@@ -2,10 +2,10 @@ package dev.araozu.juego
 
 class GestorDora(cartasIniciales: Array<Int>) {
 
-    private val cartas = Array(5) {-1}
+    private val cartas = Array(5) { -1 }
     val dora: ArrayList<Int>
-    private var turnosSigDora = 20
-    var turnosRestantesDora = turnosSigDora // 20 15 10 5
+    private var turnosSigDora = 31 // 31 15 7 3
+    var turnosRestantesDora = turnosSigDora
         private set
 
     init {
@@ -25,7 +25,7 @@ class GestorDora(cartasIniciales: Array<Int>) {
 
         if (turnosRestantesDora == 0) {
             dora.add(cartas[dora.size])
-            turnosSigDora -= 5
+            turnosSigDora = (turnosSigDora - 1) / 2
             turnosRestantesDora = turnosSigDora
         }
 
