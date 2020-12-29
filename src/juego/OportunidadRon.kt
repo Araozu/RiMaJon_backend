@@ -174,9 +174,7 @@ class OportunidadRon(override val cartaDescartada: Int, val yaku: ArrayList<Yaku
             contenedorGrupos.agregarDesdeContenedor(obtenerContenedorCartasNumero(cartasRojo))
             contenedorGrupos.agregarDesdeContenedor(obtenerContenedorCartasNumero(cartasNegro))
 
-            if (!contenedorGrupos.estaListo()) return null
-
-            val esManoAbierta = gruposAbiertos.isEmpty()
+            val esManoAbierta = gruposAbiertos.isNotEmpty()
 
             if (esManoAbierta) {
                 // Agregar los grupos abiertos al contenedor
@@ -191,6 +189,8 @@ class OportunidadRon(override val cartaDescartada: Int, val yaku: ArrayList<Yaku
                     }
                 }
             }
+
+            if (!contenedorGrupos.estaListo()) return null
 
             // Obtener yaku
             val yaku = obtenerListaYakus(contenedorGrupos, esManoAbierta)
