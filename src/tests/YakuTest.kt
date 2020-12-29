@@ -33,4 +33,22 @@ fun main() {
     // Yaku5
     impErr(testYakuEscaleraFull(), "Escalera Full")
 
+    // Yaku3
+    impErr(testYakuExterior(), "Exterior")
+    impErr(testYakuTripleTriplesCerrados(), "Triple Triples Cerrados")
+
+    // Yaku2
+    impErr(testYakuDobleSecuenciaPura(), "Doble Secuencia Pura")
+    impErr(testYakuSemiExterior(), "Semi Exterior")
+    impErr(testYakuRojo(), "Rojo")
+    impErr(testYakuNegro(), "Negro")
+    impErr(testYakuEscalera(), "Escalera")
+
+    // Yaku1
+    impErr(testYakuDobleSecuencia(), "Doble Secuencia")
+    impErr(testYakuVariedad(), "Variedad")
+    impErr(testYakuRealeza(), "Realeza")
+    impErr(testYakuTripleTriples(), "Triple Triples")
+    impErr(testYakuInterior(), "Interior")
+
 }
