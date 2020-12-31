@@ -8,7 +8,7 @@ data class DatosJuego(
     val turnoActual: String,
     val turnosHastaDora: Int,
     val dragonPartida: Dragon,
-    val oportunidadesRestantes: Int
+    val estadoJuego: EstadoJuego
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -23,7 +23,7 @@ data class DatosJuego(
         if (turnoActual != other.turnoActual) return false
         if (turnosHastaDora != other.turnosHastaDora) return false
         if (dragonPartida != other.dragonPartida) return false
-        if (oportunidadesRestantes != other.oportunidadesRestantes) return false
+        if (estadoJuego != other.estadoJuego) return false
 
         return true
     }
@@ -36,7 +36,7 @@ data class DatosJuego(
         result = 31 * result + turnoActual.hashCode()
         result = 31 * result + turnosHastaDora
         result = 31 * result + dragonPartida.hashCode()
-        result = 31 * result + oportunidadesRestantes
+        result = 31 * result + estadoJuego.hashCode()
         return result
     }
 }

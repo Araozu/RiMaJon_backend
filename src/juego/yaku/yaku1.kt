@@ -9,11 +9,6 @@ internal fun yakuDobleSecuencia(contenedorGrupos: ContenedorGrupos): Boolean {
     return false
 }
 
-internal fun yakuVariedad(contenedorGrupos: ContenedorGrupos): Boolean {
-
-    return false
-}
-
 internal fun yakuRealeza(contenedorGrupos: ContenedorGrupos): Int {
     var cantidadRealeza = 0
     for (carrl in contenedorGrupos.tris) {

@@ -32,9 +32,8 @@ enum class Yaku {
     Interior,
     TripleTriples,
     Realeza,
-    Variedad,
     DobleSecuencia,
-    ManoCompletamenteCerrada
+    ManoCerrada
 }
 
 fun obtenerListaYakus(contenedorGrupos: ContenedorGrupos, esManoAbierta: Boolean): ArrayList<Yaku> {
@@ -122,6 +121,9 @@ fun obtenerListaYakus(contenedorGrupos: ContenedorGrupos, esManoAbierta: Boolean
     val cantidadDragon = yakuDragones(contenedorGrupos)
     if (cantidadDragon > 0) {
         listaYakus.add(Yaku.Dragones)
+    }
+    if (!esManoAbierta) {
+        listaYakus.add(Yaku.ManoCerrada)
     }
 
     return listaYakus

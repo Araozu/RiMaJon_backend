@@ -46,10 +46,10 @@ fun Routing.juegows() {
                         )
                     }
                     "llamar_ron" -> {
-                        TODO()
+                        TODO("Ron no implementado")
                     }
                     "llamar_tsumo" -> {
-                        TODO()
+                        TODO("Tsumo no implementado")
                     }
                 }
             }

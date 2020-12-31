@@ -78,7 +78,7 @@ class Juego(val idJuego: String) {
             turnoActual = idJugadorTurnoActual,
             turnosHastaDora = gestorDora.turnosRestantesDora,
             dragonPartida = dragonPartida,
-            oportunidadesRestantes = oportunidadesRestantes
+            estadoJuego = estadoJuego
         )
     }
 

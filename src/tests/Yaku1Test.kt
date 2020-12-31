@@ -14,17 +14,6 @@ fun testYakuDobleSecuencia(): Boolean {
     return existeYaku(op, Yaku.DobleSecuencia)
 }
 
-fun testYakuVariedad(): Boolean {
-    val cartas = arrayListOf(
-        6, 8, 10, 40, 42, 44, 96, 96, 256, 256
-    )
-    val op = OportunidadRon.verificar(
-        valorCarta = 96,
-        cartasMano = cartas
-    )
-    return existeYaku(op, Yaku.Variedad)
-}
-
 fun testYakuRealeza(): Boolean {
     val cartas = arrayListOf(
         6, 8, 10, 40, 42, 44, 96, 96, 256, 256

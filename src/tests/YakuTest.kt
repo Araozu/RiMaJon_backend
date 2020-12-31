@@ -46,7 +46,6 @@ fun main() {
 
     // Yaku1
     impErr(testYakuDobleSecuencia(), "Doble Secuencia")
-    impErr(testYakuVariedad(), "Variedad")
     impErr(testYakuRealeza(), "Realeza")
     impErr(testYakuTripleTriples(), "Triple Triples")
     impErr(testYakuInterior(), "Interior")
