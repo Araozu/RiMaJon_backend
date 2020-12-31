@@ -7,7 +7,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.time.delay
 
 sealed class Jugador(val juego: Juego, val idUsuario: String) {
 
@@ -122,15 +121,14 @@ sealed class Jugador(val juego: Juego, val idUsuario: String) {
         return true
     }
 
-    fun manejarRon(cartaDescartada: Int): Boolean {
+    fun manejarRon(): Boolean {
+        mano.oportunidades.find { it is OportunidadRon } ?: return false
 
-        // Verificar que el jugador tenga la oportunidad
+        // Limpiar oportunidades
+        mano.oportunidades.clear()
 
-        // Verificar que la carta descartada sea correcta
-
-        // Verificar los yaku
-
-        return false
+        mano.esGanador = true
+        return true
     }
 
     private fun ultimaCartaDescartadaEs(carta: Int): Boolean =

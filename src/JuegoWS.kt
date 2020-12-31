@@ -46,12 +46,16 @@ fun Routing.juegows() {
                         )
                     }
                     "llamar_ron" -> {
-                        TODO("Ron no implementado")
+                        val datos = gson.fromJson(sol.datos, DatosIgnorarOportunidad::class.java)
+                        GestorJuegos.manejarRon(datos.idJuego, datos.idUsuario)
                     }
                     "llamar_tsumo" -> {
                         TODO("Tsumo no implementado")
                     }
                 }
+            }
+            else -> {
+                System.err.println("Tipo de dato enviado al socket no admitido")
             }
         }
 

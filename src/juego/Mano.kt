@@ -6,10 +6,13 @@ data class Mano(
     val descartes: ArrayList<Int> = arrayListOf(),
     var sigCarta: Int = -1,
     var oportunidades: ArrayList<Oportunidad> = arrayListOf(),
-    var dragon: Dragon = Dragon.Negro
+    var dragon: Dragon = Dragon.Negro,
+    var esGanador: Boolean = false
 ) {
 
     fun obtenerManoPrivada(): Mano {
+        if (esGanador) return this
+
         val l = ArrayList<Int>()
         l.addAll(cartas.map { 0 })
         return this.copy(
