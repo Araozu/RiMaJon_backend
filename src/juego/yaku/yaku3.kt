@@ -24,8 +24,3 @@ internal fun yakuExterior(contenedorGrupos: ContenedorGrupos): Boolean {
     return true
 }
 
-internal fun yakuTripleTriplesCerrados(contenedorGrupos: ContenedorGrupos): Boolean {
-
-    return false
-}
-

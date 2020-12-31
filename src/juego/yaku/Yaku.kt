@@ -86,7 +86,6 @@ fun obtenerListaYakus(contenedorGrupos: ContenedorGrupos, esManoAbierta: Boolean
     var verificarTripleTriples = true
     if (!esManoAbierta && yakuTripleTriples(contenedorGrupos)) {
         listaYakus.add(Yaku.TripleTriplesCerrados)
-        listaYakus.add(Yaku.TripleTriples)
         verificarTripleTriples = false
     }
 
